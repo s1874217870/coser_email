@@ -15,13 +15,22 @@ DATABASE_URL = (
 )
 
 # 创建异步引擎
-engine = create_async_engine(DATABASE_URL, echo=True)
+engine = create_async_engine(
+    DATABASE_URL,
+    echo=True,
+    pool_size=10,           # 连接池大小
+    max_overflow=5,         # 最大溢出连接数
+    pool_timeout=30,        # 连接池超时时间
+    pool_recycle=1800,      # 连接回收时间（30分钟）
+    pool_pre_ping=True      # 连接前ping
+)
 
 # 创建会话工厂
 SessionLocal = sessionmaker(
     engine,
     class_=AsyncSession,
-    expire_on_commit=False
+    expire_on_commit=False,
+    autoflush=False         # 禁用自动刷新以提高性能
 )
 
 async def get_db():

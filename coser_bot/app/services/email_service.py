@@ -2,11 +2,9 @@
 邮件服务模块
 处理邮件发送功能
 """
-import aiosmtplib
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
 from app.core.config import get_settings
 from app.i18n.translations import Language, get_text
+from app.tasks.email_tasks import send_verification_email
 
 settings = get_settings()
 
@@ -24,22 +22,8 @@ class EmailService:
             lang: 语言设置
         """
         try:
-            message = MIMEMultipart()
-            message["From"] = settings.SMTP_USERNAME
-            message["To"] = to_email
-            message["Subject"] = get_text(lang, "email_subject")
-            
-            body = get_text(lang, "email_body", code=code)
-            message.attach(MIMEText(body, "plain"))
-            
-            await aiosmtplib.send(
-                message,
-                hostname=settings.SMTP_SERVER,
-                port=settings.SMTP_PORT,
-                username=settings.SMTP_USERNAME,
-                password=settings.SMTP_PASSWORD,
-                use_tls=True
-            )
+            # 使用Celery异步发送邮件
+            send_verification_email.delay(to_email, code, lang.value)
             return True
             
         except Exception as e:

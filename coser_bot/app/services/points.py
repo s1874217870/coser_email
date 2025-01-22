@@ -35,7 +35,8 @@ class PointsService:
             
             # 检查是否中断连续签到
             yesterday = today - timedelta(days=1)
-            if not redis_client.exists(f"checkin:{user_id}:{yesterday}"):
+            yesterday_key = CacheManager.generate_key(CacheManager.PREFIX_CHECKIN, user_id, yesterday)
+            if not CacheManager.get_cache(yesterday_key):
                 current_streak = 0
                 
             # 更新连续签到天数

@@ -73,7 +73,8 @@ class TelegramBotService:
         """设置中文"""
         user_id = update.effective_user.id
         self.user_languages[user_id] = Language.ZH
-        redis_client.set(f"user_lang:{user_id}", Language.ZH.value)
+        lang_key = CacheManager.generate_key(CacheManager.PREFIX_USER_LANG, user_id)
+        CacheManager.set_cache(lang_key, Language.ZH.value, expire=7*86400)  # 7天过期
         await update.message.reply_text(get_text(Language.ZH, "lang_changed"))
         await self.help_command(update, context)
         
@@ -81,7 +82,8 @@ class TelegramBotService:
         """设置英文"""
         user_id = update.effective_user.id
         self.user_languages[user_id] = Language.EN
-        redis_client.set(f"user_lang:{user_id}", Language.EN.value)
+        lang_key = CacheManager.generate_key(CacheManager.PREFIX_USER_LANG, user_id)
+        CacheManager.set_cache(lang_key, Language.EN.value, expire=7*86400)  # 7天过期
         await update.message.reply_text(get_text(Language.EN, "lang_changed"))
         await self.help_command(update, context)
         
@@ -89,7 +91,8 @@ class TelegramBotService:
         """设置俄语"""
         user_id = update.effective_user.id
         self.user_languages[user_id] = Language.RU
-        redis_client.set(f"user_lang:{user_id}", Language.RU.value)
+        lang_key = CacheManager.generate_key(CacheManager.PREFIX_USER_LANG, user_id)
+        CacheManager.set_cache(lang_key, Language.RU.value, expire=7*86400)  # 7天过期
         await update.message.reply_text(get_text(Language.RU, "lang_changed"))
         await self.help_command(update, context)
         
@@ -129,13 +132,19 @@ class TelegramBotService:
                 
             # 生成验证码
             verification_code = ''.join(random.choices(string.digits, k=6))
-            redis_client.setex(f"verify_code:user:{user_id}", 600, verification_code)
+            verify_code_key = CacheManager.generate_key(CacheManager.PREFIX_VERIFY_CODE, user_id)
+            CacheManager.set_cache(verify_code_key, verification_code, expire=600)  # 10分钟过期
             
             # 获取用户群组成员信息
             member_info = await UserService.get_chat_member_info(
                 context.bot,
                 self.log_group_id,
                 user_id
+            )
+            
+            # 发送等待消息
+            wait_message = await update.message.reply_text(
+                get_text(lang, "verify_processing")
             )
             
             # 发送验证码和说明
@@ -145,17 +154,17 @@ class TelegramBotService:
                 code=verification_code,
                 email=settings.SMTP_USERNAME
             )
+            
+            # 删除等待消息并发送验证说明
+            await wait_message.delete()
             await update.message.reply_text(
                 instruction_text,
                 reply_markup=self.get_verify_keyboard(lang)
             )
             
             # 存储用户验证状态
-            redis_client.setex(
-                f"verify_status:user:{user_id}",
-                600,
-                "pending"
-            )
+            verify_status_key = CacheManager.generate_key(CacheManager.PREFIX_VERIFY_STATUS, user_id)
+            CacheManager.set_cache(verify_status_key, "pending", expire=600)  # 10分钟过期
             
             # 记录到日志群组
             log_text = (
@@ -170,15 +179,17 @@ class TelegramBotService:
         message_text = update.message.text
         lang = self.get_user_language(user_id)
         
-        verify_status = redis_client.get(f"verify_status:user:{user_id}")
+        verify_status_key = CacheManager.generate_key(CacheManager.PREFIX_VERIFY_STATUS, user_id)
+        verify_status = CacheManager.get_cache(verify_status_key)
         if verify_status == "pending":
             if re.match(r'^\d{6}$', message_text):
                 if await VerificationService.verify_code(f"user:{user_id}", message_text, lang):
                     async with SessionLocal() as db:
                         user = await UserService.get_user_by_telegram_id(db, str(user_id))
                         if user:
-                            redis_client.delete(f"verify_status:user:{user_id}")
-                            redis_client.delete(f"verify_code:user:{user_id}")
+                            verify_status_key = CacheManager.generate_key(CacheManager.PREFIX_VERIFY_STATUS, user_id)
+                            verify_code_key = CacheManager.generate_key(CacheManager.PREFIX_VERIFY_CODE, user_id)
+                            CacheManager.delete_cache(verify_status_key, verify_code_key)
                             
                             await update.message.reply_text(get_text(lang, "verify_success"))
                             
@@ -207,14 +218,47 @@ class TelegramBotService:
         user_id = update.effective_user.id
         lang = self.get_user_language(user_id)
         
+        # 发送处理消息
+        wait_message = await update.message.reply_text(
+            get_text(lang, "checkin_processing")
+        )
+        
         async with SessionLocal() as db:
             user = await UserService.get_user_by_telegram_id(db, str(user_id))
             if not user:
                 user = await UserService.create_user(db, str(user_id))
-                
+            
             success, points, message = await PointsService.daily_checkin(db, user.id)
+            
+            # 删除等待消息
+            await wait_message.delete()
+            
+            # 获取签到统计信息
+            streak_key = CacheManager.generate_key(CacheManager.PREFIX_CHECKIN_STREAK, user.id)
+            streak = CacheManager.get_cache(streak_key) or 0
+            total_points = await PointsService.get_user_points(db, user.id)
+            
+            # 发送详细的签到结果
+            if success:
+                result_text = get_text(
+                    lang,
+                    "checkin_success_detail",
+                    points=points,
+                    bonus=message,
+                    streak=streak,
+                    total=total_points
+                )
+            else:
+                result_text = get_text(
+                    lang,
+                    "checkin_already_detail",
+                    streak=streak,
+                    total=total_points,
+                    next_time=message
+                )
+            
             await update.message.reply_text(
-                get_text(lang, "checkin_success" if success else "checkin_already", points=points, bonus=message),
+                result_text,
                 reply_markup=self.get_main_menu_keyboard(lang)
             )
             
@@ -223,21 +267,41 @@ class TelegramBotService:
         user_id = update.effective_user.id
         lang = self.get_user_language(user_id)
         
+        # 发送处理消息
+        wait_message = await update.message.reply_text(
+            get_text(lang, "points_processing")
+        )
+        
         async with SessionLocal() as db:
             user = await UserService.get_user_by_telegram_id(db, str(user_id))
             if not user:
                 user = await UserService.create_user(db, str(user_id))
-                
-            streak = redis_client.get(f"checkin_streak:{user.id}") or 0
+            
+            # 获取用户积分统计
+            streak_key = CacheManager.generate_key(CacheManager.PREFIX_CHECKIN_STREAK, user.id)
+            streak = CacheManager.get_cache(streak_key) or 0
             total_points = await PointsService.get_user_points(db, user.id)
             
+            # 获取积分历史
+            recent_records = await PointsService.get_point_records(db, user.id, limit=5)
+            
+            # 删除等待消息
+            await wait_message.delete()
+            
+            # 发送详细的积分信息
+            points_text = get_text(
+                lang,
+                "points_info_detail",
+                total=total_points,
+                streak=streak,
+                history="\n".join(
+                    f"• {get_text(lang, 'points_type_' + str(record.type))}: {record.points:+d}"
+                    for record in recent_records
+                )
+            )
+            
             await update.message.reply_text(
-                get_text(
-                    lang,
-                    "points_info",
-                    total_points=total_points,
-                    streak=streak
-                ),
+                points_text,
                 reply_markup=self.get_main_menu_keyboard(lang)
             )
             
@@ -303,8 +367,9 @@ class TelegramBotService:
             await self.verify_command(update, context)
         elif data == "verify_cancel":
             # 清除验证状态
-            redis_client.delete(f"verify_status:user:{user_id}")
-            redis_client.delete(f"verify_code:user:{user_id}")
+            verify_status_key = CacheManager.generate_key(CacheManager.PREFIX_VERIFY_STATUS, user_id)
+            verify_code_key = CacheManager.generate_key(CacheManager.PREFIX_VERIFY_CODE, user_id)
+            CacheManager.delete_cache(verify_status_key, verify_code_key)
             # 发送取消消息
             await query.message.reply_text(get_text(lang, "buttons")["cancel"])
 
