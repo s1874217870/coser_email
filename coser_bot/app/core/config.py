@@ -4,13 +4,20 @@
 """
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from functools import lru_cache
+from typing import Optional
 
 class Settings(BaseSettings):
     """应用程序设置类"""
-    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        env_file_encoding="utf-8",
+        extra="allow"
+    )
     
     # 环境配置
     TESTING: bool = False
+    DEBUG: bool = False
+    API_PREFIX: str = "/api/v1"
     
     # Telegram配置
     TELEGRAM_BOT_TOKEN: str
@@ -19,15 +26,17 @@ class Settings(BaseSettings):
 
     # 数据库配置
     MYSQL_HOST: str = "localhost"
-    MYSQL_PORT: int = 3306
+    MYSQL_PORT: int = 33066
     MYSQL_USER: str = "root"
     MYSQL_PASSWORD: str = "password"
     MYSQL_DATABASE: str = "coser_bot"
+    DATABASE_URL: Optional[str] = None
     
     # Redis配置
     REDIS_HOST: str = "localhost"
     REDIS_PORT: int = 6379
     REDIS_DB: int = 0
+    REDIS_URL: Optional[str] = None
     
     # MongoDB配置
     MONGODB_URI: str = "mongodb://localhost:27017"
@@ -38,6 +47,7 @@ class Settings(BaseSettings):
     SMTP_PORT: int = 587
     SMTP_USERNAME: str
     SMTP_PASSWORD: str
+    VERIFICATION_EMAIL: Optional[str] = None
     
     # 安全配置
     SECRET_KEY: str = "your-secret-key-here"

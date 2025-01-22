@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import func
 from datetime import datetime, timedelta
 from app.models.user import User, PointRecord
-from app.core.redis import redis_client
+from app.core.redis import redis_client, CacheManager
 from app.core.config import get_settings
 from typing import Optional, List, Tuple
 
@@ -24,14 +24,14 @@ class PointsService:
         """用户每日签到"""
         # 检查今日是否已签到
         today = datetime.now().date()
-        key = f"checkin:{user_id}:{today}"
-        if redis_client.exists(key):
+        checkin_key = CacheManager.generate_key(CacheManager.PREFIX_CHECKIN, user_id, today)
+        if CacheManager.get_cache(checkin_key):
             return False, 0, "今日已签到"
             
         try:
             # 获取用户连续签到天数
-            streak_key = f"checkin_streak:{user_id}"
-            current_streak = int(redis_client.get(streak_key) or 0)
+            streak_key = CacheManager.generate_key(CacheManager.PREFIX_CHECKIN_STREAK, user_id)
+            current_streak = int(CacheManager.get_cache(streak_key) or 0)
             
             # 检查是否中断连续签到
             yesterday = today - timedelta(days=1)
@@ -40,7 +40,7 @@ class PointsService:
                 
             # 更新连续签到天数
             current_streak += 1
-            redis_client.setex(streak_key, 86400 * 31, current_streak)  # 31天过期
+            CacheManager.set_cache(streak_key, str(current_streak), expire=86400 * 31)  # 31天过期
             
             # 计算奖励积分
             points = PointsService.DAILY_CHECKIN_POINTS
@@ -54,7 +54,7 @@ class PointsService:
                 bonus_msg = f"，获得连续30天奖励{PointsService.MONTHLY_BONUS_POINTS}积分"
                 
             # 记录签到
-            redis_client.setex(key, 86400, 1)  # 24小时过期
+            CacheManager.set_cache(checkin_key, "1", expire=86400)  # 24小时过期
             
             # 添加积分记录
             point_record = PointRecord(

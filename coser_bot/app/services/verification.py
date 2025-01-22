@@ -2,7 +2,7 @@
 验证服务模块
 处理邮箱验证和验证码验证
 """
-from app.core.redis import redis_client
+from app.core.redis import redis_client, CacheManager
 from app.services.email_service import EmailService
 from app.i18n.translations import Language
 from app.core.config import get_settings
@@ -23,12 +23,9 @@ class VerificationService:
     @staticmethod
     async def verify_code(identifier: str, code: str, lang: Language = Language.ZH) -> bool:
         """验证用户提供的验证码并发送验证邮件"""
-        stored_code = redis_client.get(f"verify_code:{identifier}")
-        if not stored_code:
-            return False
-            
-        # 验证码匹配检查
-        if stored_code != code:
+        verify_key = CacheManager.generate_key(CacheManager.PREFIX_VERIFY_CODE, identifier)
+        stored_code = CacheManager.get_cache(verify_key)
+        if not stored_code or stored_code != code:
             return False
             
         # 发送验证邮件
@@ -40,11 +37,8 @@ class VerificationService:
             )
             
             # 记录验证成功
-            redis_client.setex(
-                f"verify_success:{identifier}",
-                600,  # 10分钟有效期
-                "1"
-            )
+            success_key = CacheManager.generate_key("verify_success", identifier)
+            CacheManager.set_cache(success_key, "1", expire=600)  # 10分钟有效期
             
             return True
         except Exception as e:
@@ -54,10 +48,6 @@ class VerificationService:
     @staticmethod
     async def check_retry_limit(identifier: str, limit: int = 5, period: int = 3600) -> bool:
         """检查是否超出重试限制"""
-        key = f"verify_retry:{identifier}"
-        retry_count = redis_client.incr(key)
-        
-        if retry_count == 1:
-            redis_client.expire(key, period)
-            
-        return retry_count <= limit
+        retry_key = CacheManager.generate_key("verify_retry", identifier)
+        retry_count = CacheManager.incr_with_expire(retry_key, period)
+        return retry_count is not None and retry_count <= limit

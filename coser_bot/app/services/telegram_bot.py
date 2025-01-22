@@ -12,7 +12,7 @@ from telegram.ext import (
     filters
 )
 from app.core.config import get_settings
-from app.core.redis import redis_client, RateLimit
+from app.core.redis import redis_client, RateLimit, CacheManager
 from app.services.blacklist import BlacklistService
 from app.services.user import UserService
 from app.services.verification import VerificationService
@@ -60,11 +60,13 @@ class TelegramBotService:
     def get_user_language(self, user_id: int) -> Language:
         """获取用户语言设置"""
         if user_id not in self.user_languages:
-            lang_code = redis_client.get(f"user_lang:{user_id}")
+            lang_key = CacheManager.generate_key(CacheManager.PREFIX_USER_LANG, user_id)
+            lang_code = CacheManager.get_cache(lang_key)
             if lang_code:
                 self.user_languages[user_id] = Language(lang_code)
             else:
                 self.user_languages[user_id] = Language.ZH
+                CacheManager.set_cache(lang_key, Language.ZH.value, expire=7*86400)  # 7天过期
         return self.user_languages[user_id]
         
     async def set_language_zh(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
