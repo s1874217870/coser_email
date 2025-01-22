@@ -1,0 +1,279 @@
+Collecting pydantic-settings
+  Downloading pydantic_settings-2.7.1-py3-none-any.whl.metadata (3.5 kB)
+Requirement already satisfied: python-telegram-bot in ./venv/lib/python3.12/site-packages (21.10)
+Collecting aio-pika
+  Downloading aio_pika-9.5.4-py3-none-any.whl.metadata (16 kB)
+Collecting motor
+  Downloading motor-3.6.1-py3-none-any.whl.metadata (21 kB)
+Requirement already satisfied: redis in ./venv/lib/python3.12/site-packages (5.2.1)
+Requirement already satisfied: pymysql in ./venv/lib/python3.12/site-packages (1.1.1)
+Requirement already satisfied: sqlalchemy in ./venv/lib/python3.12/site-packages (2.0.37)
+Requirement already satisfied: pytest in ./venv/lib/python3.12/site-packages (8.3.4)
+Requirement already satisfied: pytest-asyncio in ./venv/lib/python3.12/site-packages (0.25.2)
+Requirement already satisfied: pydantic>=2.7.0 in ./venv/lib/python3.12/site-packages (from pydantic-settings) (2.10.5)
+Requirement already satisfied: python-dotenv>=0.21.0 in ./venv/lib/python3.12/site-packages (from pydantic-settings) (1.0.1)
+Requirement already satisfied: httpx~=0.27 in ./venv/lib/python3.12/site-packages (from python-telegram-bot) (0.28.1)
+Collecting aiormq<6.9,>=6.8 (from aio-pika)
+  Downloading aiormq-6.8.1-py3-none-any.whl.metadata (19 kB)
+Collecting exceptiongroup<2,>=1 (from aio-pika)
+  Downloading exceptiongroup-1.2.2-py3-none-any.whl.metadata (6.6 kB)
+Collecting yarl (from aio-pika)
+  Downloading yarl-1.18.3-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (69 kB)
+Collecting pymongo<4.10,>=4.9 (from motor)
+  Downloading pymongo-4.9.2-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (22 kB)
+Requirement already satisfied: greenlet!=0.4.17 in ./venv/lib/python3.12/site-packages (from sqlalchemy) (3.1.1)
+Requirement already satisfied: typing-extensions>=4.6.0 in ./venv/lib/python3.12/site-packages (from sqlalchemy) (4.12.2)
+Requirement already satisfied: iniconfig in ./venv/lib/python3.12/site-packages (from pytest) (2.0.0)
+Requirement already satisfied: packaging in ./venv/lib/python3.12/site-packages (from pytest) (24.2)
+Requirement already satisfied: pluggy<2,>=1.5 in ./venv/lib/python3.12/site-packages (from pytest) (1.5.0)
+Collecting pamqp==3.3.0 (from aiormq<6.9,>=6.8->aio-pika)
+  Downloading pamqp-3.3.0-py2.py3-none-any.whl.metadata (4.7 kB)
+Requirement already satisfied: anyio in ./venv/lib/python3.12/site-packages (from httpx~=0.27->python-telegram-bot) (4.8.0)
+Requirement already satisfied: certifi in ./venv/lib/python3.12/site-packages (from httpx~=0.27->python-telegram-bot) (2024.12.14)
+Requirement already satisfied: httpcore==1.* in ./venv/lib/python3.12/site-packages (from httpx~=0.27->python-telegram-bot) (1.0.7)
+Requirement already satisfied: idna in ./venv/lib/python3.12/site-packages (from httpx~=0.27->python-telegram-bot) (3.10)
+Requirement already satisfied: h11<0.15,>=0.13 in ./venv/lib/python3.12/site-packages (from httpcore==1.*->httpx~=0.27->python-telegram-bot) (0.14.0)
+Requirement already satisfied: annotated-types>=0.6.0 in ./venv/lib/python3.12/site-packages (from pydantic>=2.7.0->pydantic-settings) (0.7.0)
+Requirement already satisfied: pydantic-core==2.27.2 in ./venv/lib/python3.12/site-packages (from pydantic>=2.7.0->pydantic-settings) (2.27.2)
+Requirement already satisfied: dnspython<3.0.0,>=1.16.0 in ./venv/lib/python3.12/site-packages (from pymongo<4.10,>=4.9->motor) (2.7.0)
+Collecting multidict>=4.0 (from yarl->aio-pika)
+  Downloading multidict-6.1.0-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (5.0 kB)
+Collecting propcache>=0.2.0 (from yarl->aio-pika)
+  Downloading propcache-0.2.1-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (9.2 kB)
+Requirement already satisfied: sniffio>=1.1 in ./venv/lib/python3.12/site-packages (from anyio->httpx~=0.27->python-telegram-bot) (1.3.1)
+Downloading pydantic_settings-2.7.1-py3-none-any.whl (29 kB)
+Downloading aio_pika-9.5.4-py3-none-any.whl (54 kB)
+Downloading motor-3.6.1-py3-none-any.whl (74 kB)
+Downloading aiormq-6.8.1-py3-none-any.whl (31 kB)
+Downloading pamqp-3.3.0-py2.py3-none-any.whl (33 kB)
+Downloading exceptiongroup-1.2.2-py3-none-any.whl (16 kB)
+Downloading pymongo-4.9.2-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (1.9 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.9/1.9 MB 95.1 MB/s eta 0:00:00
+Downloading yarl-1.18.3-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (336 kB)
+Downloading multidict-6.1.0-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (131 kB)
+Downloading propcache-0.2.1-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (243 kB)
+Installing collected packages: pymongo, propcache, pamqp, multidict, exceptiongroup, yarl, motor, pydantic-settings, aiormq, aio-pika
+  Attempting uninstall: pymongo
+    Found existing installation: pymongo 4.10.1
+    Uninstalling pymongo-4.10.1:
+      Successfully uninstalled pymongo-4.10.1
+Successfully installed aio-pika-9.5.4 aiormq-6.8.1 exceptiongroup-1.2.2 motor-3.6.1 multidict-6.1.0 pamqp-3.3.0 propcache-0.2.1 pydantic-settings-2.7.1 pymongo-4.9.2 yarl-1.18.3
+/home/ubuntu/coser_bot/venv/lib/python3.12/site-packages/pytest_asyncio/plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+============================= test session starts ==============================
+platform linux -- Python 3.12.8, pytest-8.3.4, pluggy-1.5.0 -- /home/ubuntu/coser_bot/venv/bin/python
+cachedir: .pytest_cache
+rootdir: /home/ubuntu/coser_bot
+plugins: anyio-4.8.0, asyncio-0.25.2
+asyncio: mode=Mode.STRICT, asyncio_default_fixture_loop_scope=None
+collected 4 items                                                              
+
+tests/test_verification.py::test_email_format_validation PASSED          [ 25%]
+tests/test_verification.py::test_verification_code FAILED                [ 50%]
+tests/test_verification.py::test_rate_limit FAILED                       [ 75%]
+tests/test_verification.py::test_email_sending PASSED                    [100%]
+
+=================================== FAILURES ===================================
+____________________________ test_verification_code ____________________________
+
+self = <redis.connection.Connection(host=localhost,port=6379,db=0)>
+
+    def connect(self):
+        "Connects to the Redis server if not already connected"
+        if self._sock:
+            return
+        try:
+>           sock = self.retry.call_with_retry(
+                lambda: self._connect(), lambda error: self.disconnect(error)
+            )
+
+venv/lib/python3.12/site-packages/redis/connection.py:357: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+venv/lib/python3.12/site-packages/redis/retry.py:62: in call_with_retry
+    return do()
+venv/lib/python3.12/site-packages/redis/connection.py:358: in <lambda>
+    lambda: self._connect(), lambda error: self.disconnect(error)
+venv/lib/python3.12/site-packages/redis/connection.py:730: in _connect
+    raise err
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <redis.connection.Connection(host=localhost,port=6379,db=0)>
+
+    def _connect(self):
+        "Create a TCP socket connection"
+        # we want to mimic what socket.create_connection does to support
+        # ipv4/ipv6, but we want to set options prior to calling
+        # socket.connect()
+        err = None
+        for res in socket.getaddrinfo(
+            self.host, self.port, self.socket_type, socket.SOCK_STREAM
+        ):
+            family, socktype, proto, canonname, socket_address = res
+            sock = None
+            try:
+                sock = socket.socket(family, socktype, proto)
+                # TCP_NODELAY
+                sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
+    
+                # TCP_KEEPALIVE
+                if self.socket_keepalive:
+                    sock.setsockopt(socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1)
+                    for k, v in self.socket_keepalive_options.items():
+                        sock.setsockopt(socket.IPPROTO_TCP, k, v)
+    
+                # set the socket_connect_timeout before we connect
+                sock.settimeout(self.socket_connect_timeout)
+    
+                # connect
+>               sock.connect(socket_address)
+E               ConnectionRefusedError: [Errno 111] Connection refused
+
+venv/lib/python3.12/site-packages/redis/connection.py:718: ConnectionRefusedError
+
+During handling of the above exception, another exception occurred:
+
+    @pytest.mark.asyncio
+    async def test_verification_code():
+        """测试验证码功能"""
+        user_id = 123456
+        code = "123456"
+    
+        # 存储验证码
+>       redis_client.setex(f"verify_code:{user_id}", 600, code)
+
+tests/test_verification.py:45: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+venv/lib/python3.12/site-packages/redis/commands/core.py:2360: in setex
+    return self.execute_command("SETEX", name, time, value)
+venv/lib/python3.12/site-packages/redis/client.py:559: in execute_command
+    return self._execute_command(*args, **options)
+venv/lib/python3.12/site-packages/redis/client.py:565: in _execute_command
+    conn = self.connection or pool.get_connection(command_name, **options)
+venv/lib/python3.12/site-packages/redis/connection.py:1422: in get_connection
+    connection.connect()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <redis.connection.Connection(host=localhost,port=6379,db=0)>
+
+    def connect(self):
+        "Connects to the Redis server if not already connected"
+        if self._sock:
+            return
+        try:
+            sock = self.retry.call_with_retry(
+                lambda: self._connect(), lambda error: self.disconnect(error)
+            )
+        except socket.timeout:
+            raise TimeoutError("Timeout connecting to server")
+        except OSError as e:
+>           raise ConnectionError(self._error_message(e))
+E           redis.exceptions.ConnectionError: Error 111 connecting to localhost:6379. Connection refused.
+
+venv/lib/python3.12/site-packages/redis/connection.py:363: ConnectionError
+_______________________________ test_rate_limit ________________________________
+
+self = <redis.connection.Connection(host=localhost,port=6379,db=0)>
+
+    def connect(self):
+        "Connects to the Redis server if not already connected"
+        if self._sock:
+            return
+        try:
+>           sock = self.retry.call_with_retry(
+                lambda: self._connect(), lambda error: self.disconnect(error)
+            )
+
+venv/lib/python3.12/site-packages/redis/connection.py:357: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+venv/lib/python3.12/site-packages/redis/retry.py:62: in call_with_retry
+    return do()
+venv/lib/python3.12/site-packages/redis/connection.py:358: in <lambda>
+    lambda: self._connect(), lambda error: self.disconnect(error)
+venv/lib/python3.12/site-packages/redis/connection.py:730: in _connect
+    raise err
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <redis.connection.Connection(host=localhost,port=6379,db=0)>
+
+    def _connect(self):
+        "Create a TCP socket connection"
+        # we want to mimic what socket.create_connection does to support
+        # ipv4/ipv6, but we want to set options prior to calling
+        # socket.connect()
+        err = None
+        for res in socket.getaddrinfo(
+            self.host, self.port, self.socket_type, socket.SOCK_STREAM
+        ):
+            family, socktype, proto, canonname, socket_address = res
+            sock = None
+            try:
+                sock = socket.socket(family, socktype, proto)
+                # TCP_NODELAY
+                sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
+    
+                # TCP_KEEPALIVE
+                if self.socket_keepalive:
+                    sock.setsockopt(socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1)
+                    for k, v in self.socket_keepalive_options.items():
+                        sock.setsockopt(socket.IPPROTO_TCP, k, v)
+    
+                # set the socket_connect_timeout before we connect
+                sock.settimeout(self.socket_connect_timeout)
+    
+                # connect
+>               sock.connect(socket_address)
+E               ConnectionRefusedError: [Errno 111] Connection refused
+
+venv/lib/python3.12/site-packages/redis/connection.py:718: ConnectionRefusedError
+
+During handling of the above exception, another exception occurred:
+
+    @pytest.mark.asyncio
+    async def test_rate_limit():
+        """测试IP限流"""
+        ip = "127.0.0.1"
+    
+        # 清除之前的限流记录
+>       redis_client.delete(f"rate_limit:{ip}")
+
+tests/test_verification.py:61: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+venv/lib/python3.12/site-packages/redis/commands/core.py:1705: in delete
+    return self.execute_command("DEL", *names)
+venv/lib/python3.12/site-packages/redis/client.py:559: in execute_command
+    return self._execute_command(*args, **options)
+venv/lib/python3.12/site-packages/redis/client.py:565: in _execute_command
+    conn = self.connection or pool.get_connection(command_name, **options)
+venv/lib/python3.12/site-packages/redis/connection.py:1422: in get_connection
+    connection.connect()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <redis.connection.Connection(host=localhost,port=6379,db=0)>
+
+    def connect(self):
+        "Connects to the Redis server if not already connected"
+        if self._sock:
+            return
+        try:
+            sock = self.retry.call_with_retry(
+                lambda: self._connect(), lambda error: self.disconnect(error)
+            )
+        except socket.timeout:
+            raise TimeoutError("Timeout connecting to server")
+        except OSError as e:
+>           raise ConnectionError(self._error_message(e))
+E           redis.exceptions.ConnectionError: Error 111 connecting to localhost:6379. Connection refused.
+
+venv/lib/python3.12/site-packages/redis/connection.py:363: ConnectionError
+=============================== warnings summary ===============================
+venv/lib/python3.12/site-packages/pydantic/_internal/_config.py:295
+  /home/ubuntu/coser_bot/venv/lib/python3.12/site-packages/pydantic/_internal/_config.py:295: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.10/migration/
+    warnings.warn(DEPRECATION_MESSAGE, DeprecationWarning)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_verification.py::test_verification_code - redis.exceptions.ConnectionError: Error 111 connecting to localhost:6379. C...
+FAILED tests/test_verification.py::test_rate_limit - redis.exceptions.ConnectionError: Error 111 connecting to localhost:6379. C...
+==================== 2 failed, 2 passed, 1 warning in 3.08s ====================

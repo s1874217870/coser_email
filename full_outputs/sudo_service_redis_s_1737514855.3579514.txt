@@ -1,0 +1,1227 @@
+/home/ubuntu/.pyenv/versions/3.12.8/lib/python3.12/site-packages/pytest_asyncio/plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+============================= test session starts ==============================
+platform linux -- Python 3.12.8, pytest-8.3.4, pluggy-1.5.0 -- /home/ubuntu/.pyenv/versions/3.12.8/bin/python
+cachedir: .pytest_cache
+rootdir: /home/ubuntu/coser_bot
+configfile: pyproject.toml
+plugins: anyio-4.8.0, asyncio-0.25.2
+asyncio: mode=Mode.STRICT, asyncio_default_fixture_loop_scope=None
+collected 23 items                                                             
+
+tests/test_admin.py::test_create_admin_user PASSED                       [  4%]
+tests/test_admin.py::test_create_admin_log PASSED                        [  8%]
+tests/test_admin_auth.py::test_login FAILED                              [ 13%]
+tests/test_admin_auth.py::test_login_invalid_credentials PASSED          [ 17%]
+tests/test_admin_auth.py::test_get_admin_info FAILED                     [ 21%]
+tests/test_admin_auth.py::test_logout FAILED                             [ 26%]
+tests/test_admin_endpoints.py::test_ban_user PASSED                      [ 30%]
+tests/test_admin_endpoints.py::test_unban_user PASSED                    [ 34%]
+tests/test_admin_endpoints.py::test_adjust_points PASSED                 [ 39%]
+tests/test_admin_endpoints.py::test_get_user_stats PASSED                [ 43%]
+tests/test_auth.py::test_password_hashing PASSED                         [ 47%]
+tests/test_auth.py::test_token_creation PASSED                           [ 52%]
+tests/test_auth.py::test_token_blacklist PASSED                          [ 56%]
+tests/test_group_management.py::test_mute_user PASSED                    [ 60%]
+tests/test_group_management.py::test_unmute_user PASSED                  [ 65%]
+tests/test_group_management.py::test_get_chat_member PASSED              [ 69%]
+tests/test_points.py::test_daily_checkin PASSED                          [ 73%]
+tests/test_points.py::test_activity_points PASSED                        [ 78%]
+tests/test_points.py::test_content_points PASSED                         [ 82%]
+tests/test_verification.py::test_email_format_validation PASSED          [ 86%]
+tests/test_verification.py::test_verification_code PASSED                [ 91%]
+tests/test_verification.py::test_rate_limit PASSED                       [ 95%]
+tests/test_verification.py::test_email_sending PASSED                    [100%]
+
+=================================== FAILURES ===================================
+__________________________________ test_login __________________________________
+
+client = <httpx.AsyncClient object at 0x7f7b051f76e0>
+test_db = <sqlalchemy.ext.asyncio.session.AsyncSession object at 0x7f7b05275520>
+test_admin = <app.models.admin.AdminUser object at 0x7f7b0548ce30>
+
+    @pytest.mark.asyncio
+    async def test_login(client, test_db, test_admin):
+        """测试登录"""
+        print("\n=== 测试管理员登录 ===")
+    
+        # 使用 application/x-www-form-urlencoded 格式
+        form_data = {
+            "username": "test_admin",
+            "password": "testpass123",
+            "grant_type": "password"
+        }
+    
+        headers = {
+            "Content-Type": "application/x-www-form-urlencoded"
+        }
+    
+        print(f"发送登录请求: {form_data}")
+>       response = await client.post(
+            "/admin/login",
+            headers=headers,
+            data=form_data
+        )
+
+tests/test_admin_auth.py:26: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../.pyenv/versions/3.12.8/lib/python3.12/site-packages/httpx/_client.py:1859: in post
+    return await self.request(
+../.pyenv/versions/3.12.8/lib/python3.12/site-packages/httpx/_client.py:1540: in request
+    return await self.send(request, auth=auth, follow_redirects=follow_redirects)
+../.pyenv/versions/3.12.8/lib/python3.12/site-packages/httpx/_client.py:1629: in send
+    response = await self._send_handling_auth(
+../.pyenv/versions/3.12.8/lib/python3.12/site-packages/httpx/_client.py:1657: in _send_handling_auth
+    response = await self._send_handling_redirects(
+../.pyenv/versions/3.12.8/lib/python3.12/site-packages/httpx/_client.py:1694: in _send_handling_redirects
+    response = await self._send_single_request(request)
+../.pyenv/versions/3.12.8/lib/python3.12/site-packages/httpx/_client.py:1730: in _send_single_request
+    response = await transport.handle_async_request(request)
+../.pyenv/versions/3.12.8/lib/python3.12/site-packages/httpx/_transports/asgi.py:170: in handle_async_request
+    await self.app(scope, receive, send)
+../.pyenv/versions/3.12.8/lib/python3.12/site-packages/fastapi/applications.py:1054: in __call__
+    await super().__call__(scope, receive, send)
+../.pyenv/versions/3.12.8/lib/python3.12/site-packages/starlette/applications.py:113: in __call__
+    await self.middleware_stack(scope, receive, send)
+../.pyenv/versions/3.12.8/lib/python3.12/site-packages/starlette/middleware/errors.py:187: in __call__
+    raise exc
+../.pyenv/versions/3.12.8/lib/python3.12/site-packages/starlette/middleware/errors.py:165: in __call__
+    await self.app(scope, receive, _send)
+../.pyenv/versions/3.12.8/lib/python3.12/site-packages/starlette/middleware/exceptions.py:62: in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+../.pyenv/versions/3.12.8/lib/python3.12/site-packages/starlette/_exception_handler.py:53: in wrapped_app
+    raise exc
+../.pyenv/versions/3.12.8/lib/python3.12/site-packages/starlette/_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+../.pyenv/versions/3.12.8/lib/python3.12/site-packages/starlette/routing.py:715: in __call__
+    await self.middleware_stack(scope, receive, send)
+../.pyenv/versions/3.12.8/lib/python3.12/site-packages/starlette/routing.py:735: in app
+    await route.handle(scope, receive, send)
+../.pyenv/versions/3.12.8/lib/python3.12/site-packages/starlette/routing.py:288: in handle
+    await self.app(scope, receive, send)
+../.pyenv/versions/3.12.8/lib/python3.12/site-packages/starlette/routing.py:76: in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+../.pyenv/versions/3.12.8/lib/python3.12/site-packages/starlette/_exception_handler.py:53: in wrapped_app
+    raise exc
+../.pyenv/versions/3.12.8/lib/python3.12/site-packages/starlette/_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+../.pyenv/versions/3.12.8/lib/python3.12/site-packages/starlette/routing.py:73: in app
+    response = await f(request)
+../.pyenv/versions/3.12.8/lib/python3.12/site-packages/fastapi/routing.py:327: in app
+    content = await serialize_response(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    async def serialize_response(
+        *,
+        field: Optional[ModelField] = None,
+        response_content: Any,
+        include: Optional[IncEx] = None,
+        exclude: Optional[IncEx] = None,
+        by_alias: bool = True,
+        exclude_unset: bool = False,
+        exclude_defaults: bool = False,
+        exclude_none: bool = False,
+        is_coroutine: bool = True,
+    ) -> Any:
+        if field:
+            errors = []
+            if not hasattr(field, "serialize"):
+                # pydantic v1
+                response_content = _prepare_response_content(
+                    response_content,
+                    exclude_unset=exclude_unset,
+                    exclude_defaults=exclude_defaults,
+                    exclude_none=exclude_none,
+                )
+            if is_coroutine:
+                value, errors_ = field.validate(response_content, {}, loc=("response",))
+            else:
+                value, errors_ = await run_in_threadpool(
+                    field.validate, response_content, {}, loc=("response",)
+                )
+            if isinstance(errors_, list):
+                errors.extend(errors_)
+            elif errors_:
+                errors.append(errors_)
+            if errors:
+>               raise ResponseValidationError(
+                    errors=_normalize_errors(errors), body=response_content
+                )
+E               fastapi.exceptions.ResponseValidationError: 1 validation errors:
+E                 {'type': 'missing', 'loc': ('response', 'access_token'), 'msg': 'Field required', 'input': {'code': 0, 'message': '登录成功', 'data': Token(access_token='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZXhwIjoxNzM3NTE2NjQ4fQ.m6Z12_OilVRwcG2o9vQS7UC50nPh8QW1cU4_sovOeAs', token_type='bearer')}}
+
+../.pyenv/versions/3.12.8/lib/python3.12/site-packages/fastapi/routing.py:176: ResponseValidationError
+---------------------------- Captured stdout setup -----------------------------
+2025-01-22 03:00:47,726 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2025-01-22 03:00:47,726 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("users")
+2025-01-22 03:00:47,726 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-01-22 03:00:47,727 INFO sqlalchemy.engine.Engine PRAGMA temp.table_info("users")
+2025-01-22 03:00:47,727 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-01-22 03:00:47,727 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("point_records")
+2025-01-22 03:00:47,727 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-01-22 03:00:47,728 INFO sqlalchemy.engine.Engine PRAGMA temp.table_info("point_records")
+2025-01-22 03:00:47,728 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-01-22 03:00:47,728 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("admin_users")
+2025-01-22 03:00:47,728 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-01-22 03:00:47,729 INFO sqlalchemy.engine.Engine PRAGMA temp.table_info("admin_users")
+2025-01-22 03:00:47,729 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-01-22 03:00:47,729 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("admin_logs")
+2025-01-22 03:00:47,730 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-01-22 03:00:47,730 INFO sqlalchemy.engine.Engine PRAGMA temp.table_info("admin_logs")
+2025-01-22 03:00:47,730 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-01-22 03:00:47,731 INFO sqlalchemy.engine.Engine 
+CREATE TABLE users (
+	id INTEGER NOT NULL, 
+	telegram_id VARCHAR(32) NOT NULL, 
+	email VARCHAR(128), 
+	status INTEGER, 
+	points INTEGER, 
+	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL, 
+	updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL, 
+	PRIMARY KEY (id), 
+	UNIQUE (telegram_id), 
+	UNIQUE (email)
+)
+
+
+2025-01-22 03:00:47,731 INFO sqlalchemy.engine.Engine [no key 0.00008s] ()
+2025-01-22 03:00:47,732 INFO sqlalchemy.engine.Engine 
+CREATE TABLE point_records (
+	id INTEGER NOT NULL, 
+	user_id INTEGER NOT NULL, 
+	points INTEGER NOT NULL, 
+	type INTEGER NOT NULL, 
+	description VARCHAR(255), 
+	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL, 
+	PRIMARY KEY (id)
+)
+
+
+2025-01-22 03:00:47,732 INFO sqlalchemy.engine.Engine [no key 0.00008s] ()
+2025-01-22 03:00:47,732 INFO sqlalchemy.engine.Engine 
+CREATE TABLE admin_users (
+	id INTEGER NOT NULL, 
+	username VARCHAR(50) NOT NULL, 
+	password_hash VARCHAR(255) NOT NULL, 
+	role VARCHAR(10) NOT NULL, 
+	is_active BOOLEAN, 
+	last_login TIMESTAMP, 
+	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL, 
+	updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL, 
+	PRIMARY KEY (id), 
+	UNIQUE (username)
+)
+
+
+2025-01-22 03:00:47,732 INFO sqlalchemy.engine.Engine [no key 0.00007s] ()
+2025-01-22 03:00:47,733 INFO sqlalchemy.engine.Engine 
+CREATE TABLE admin_logs (
+	id INTEGER NOT NULL, 
+	admin_id INTEGER NOT NULL, 
+	action VARCHAR(50) NOT NULL, 
+	target_type VARCHAR(50) NOT NULL, 
+	target_id VARCHAR(50) NOT NULL, 
+	details VARCHAR(500), 
+	ip_address VARCHAR(50), 
+	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL, 
+	PRIMARY KEY (id), 
+	FOREIGN KEY(admin_id) REFERENCES admin_users (id)
+)
+
+
+2025-01-22 03:00:47,733 INFO sqlalchemy.engine.Engine [no key 0.00007s] ()
+2025-01-22 03:00:47,733 INFO sqlalchemy.engine.Engine COMMIT
+2025-01-22 03:00:48,019 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2025-01-22 03:00:48,020 INFO sqlalchemy.engine.Engine INSERT INTO admin_users (username, password_hash, role, is_active, last_login) VALUES (?, ?, ?, ?, ?) RETURNING id, created_at, updated_at
+2025-01-22 03:00:48,020 INFO sqlalchemy.engine.Engine [generated in 0.00016s] ('test_admin', '$2b$12$r3bdbAPd8VPnYqhQdsnUPeuHYKuloNGrikXLyNv.lgWmoWT1.QyXu', 'SUPERADMIN', 1, None)
+2025-01-22 03:00:48,021 INFO sqlalchemy.engine.Engine COMMIT
+2025-01-22 03:00:48,021 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2025-01-22 03:00:48,022 INFO sqlalchemy.engine.Engine SELECT admin_users.id, admin_users.username, admin_users.password_hash, admin_users.role, admin_users.is_active, admin_users.last_login, admin_users.created_at, admin_users.updated_at 
+FROM admin_users 
+WHERE admin_users.id = ?
+2025-01-22 03:00:48,022 INFO sqlalchemy.engine.Engine [generated in 0.00012s] (1,)
+------------------------------ Captured log setup ------------------------------
+INFO     sqlalchemy.engine.Engine:base.py:2699 BEGIN (implicit)
+INFO     sqlalchemy.engine.Engine:base.py:1843 PRAGMA main.table_info("users")
+INFO     sqlalchemy.engine.Engine:base.py:1843 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 PRAGMA temp.table_info("users")
+INFO     sqlalchemy.engine.Engine:base.py:1843 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 PRAGMA main.table_info("point_records")
+INFO     sqlalchemy.engine.Engine:base.py:1843 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 PRAGMA temp.table_info("point_records")
+INFO     sqlalchemy.engine.Engine:base.py:1843 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 PRAGMA main.table_info("admin_users")
+INFO     sqlalchemy.engine.Engine:base.py:1843 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 PRAGMA temp.table_info("admin_users")
+INFO     sqlalchemy.engine.Engine:base.py:1843 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 PRAGMA main.table_info("admin_logs")
+INFO     sqlalchemy.engine.Engine:base.py:1843 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 PRAGMA temp.table_info("admin_logs")
+INFO     sqlalchemy.engine.Engine:base.py:1843 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 
+CREATE TABLE users (
+	id INTEGER NOT NULL, 
+	telegram_id VARCHAR(32) NOT NULL, 
+	email VARCHAR(128), 
+	status INTEGER, 
+	points INTEGER, 
+	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL, 
+	updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL, 
+	PRIMARY KEY (id), 
+	UNIQUE (telegram_id), 
+	UNIQUE (email)
+)
+
+
+INFO     sqlalchemy.engine.Engine:base.py:1843 [no key 0.00008s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 
+CREATE TABLE point_records (
+	id INTEGER NOT NULL, 
+	user_id INTEGER NOT NULL, 
+	points INTEGER NOT NULL, 
+	type INTEGER NOT NULL, 
+	description VARCHAR(255), 
+	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL, 
+	PRIMARY KEY (id)
+)
+
+
+INFO     sqlalchemy.engine.Engine:base.py:1843 [no key 0.00008s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 
+CREATE TABLE admin_users (
+	id INTEGER NOT NULL, 
+	username VARCHAR(50) NOT NULL, 
+	password_hash VARCHAR(255) NOT NULL, 
+	role VARCHAR(10) NOT NULL, 
+	is_active BOOLEAN, 
+	last_login TIMESTAMP, 
+	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL, 
+	updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL, 
+	PRIMARY KEY (id), 
+	UNIQUE (username)
+)
+
+
+INFO     sqlalchemy.engine.Engine:base.py:1843 [no key 0.00007s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 
+CREATE TABLE admin_logs (
+	id INTEGER NOT NULL, 
+	admin_id INTEGER NOT NULL, 
+	action VARCHAR(50) NOT NULL, 
+	target_type VARCHAR(50) NOT NULL, 
+	target_id VARCHAR(50) NOT NULL, 
+	details VARCHAR(500), 
+	ip_address VARCHAR(50), 
+	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL, 
+	PRIMARY KEY (id), 
+	FOREIGN KEY(admin_id) REFERENCES admin_users (id)
+)
+
+
+INFO     sqlalchemy.engine.Engine:base.py:1843 [no key 0.00007s] ()
+INFO     sqlalchemy.engine.Engine:base.py:2705 COMMIT
+WARNING  passlib.handlers.bcrypt:bcrypt.py:622 (trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "/home/ubuntu/.pyenv/versions/3.12.8/lib/python3.12/site-packages/passlib/handlers/bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+              ^^^^^^^^^^^^^^^^^
+AttributeError: module 'bcrypt' has no attribute '__about__'
+INFO     sqlalchemy.engine.Engine:base.py:2699 BEGIN (implicit)
+INFO     sqlalchemy.engine.Engine:base.py:1843 INSERT INTO admin_users (username, password_hash, role, is_active, last_login) VALUES (?, ?, ?, ?, ?) RETURNING id, created_at, updated_at
+INFO     sqlalchemy.engine.Engine:base.py:1843 [generated in 0.00016s] ('test_admin', '$2b$12$r3bdbAPd8VPnYqhQdsnUPeuHYKuloNGrikXLyNv.lgWmoWT1.QyXu', 'SUPERADMIN', 1, None)
+INFO     sqlalchemy.engine.Engine:base.py:2705 COMMIT
+INFO     sqlalchemy.engine.Engine:base.py:2699 BEGIN (implicit)
+INFO     sqlalchemy.engine.Engine:base.py:1843 SELECT admin_users.id, admin_users.username, admin_users.password_hash, admin_users.role, admin_users.is_active, admin_users.last_login, admin_users.created_at, admin_users.updated_at 
+FROM admin_users 
+WHERE admin_users.id = ?
+INFO     sqlalchemy.engine.Engine:base.py:1843 [generated in 0.00012s] (1,)
+----------------------------- Captured stdout call -----------------------------
+
+=== 测试管理员登录 ===
+发送登录请求: {'username': 'test_admin', 'password': 'testpass123', 'grant_type': 'password'}
+2025-01-22 03:00:48,080 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2025-01-22 03:00:48,081 INFO sqlalchemy.engine.Engine SELECT admin_users.id, admin_users.username, admin_users.password_hash, admin_users.role, admin_users.is_active, admin_users.last_login, admin_users.created_at, admin_users.updated_at 
+FROM admin_users 
+WHERE admin_users.username = ?
+2025-01-22 03:00:48,081 INFO sqlalchemy.engine.Engine [generated in 0.00014s] ('test_admin',)
+2025-01-22 03:00:48,334 INFO sqlalchemy.engine.Engine SELECT admin_users.is_active 
+FROM admin_users 
+WHERE admin_users.id = ?
+2025-01-22 03:00:48,335 INFO sqlalchemy.engine.Engine [generated in 0.00013s] (1,)
+2025-01-22 03:00:48,338 INFO sqlalchemy.engine.Engine UPDATE admin_users SET last_login=? WHERE admin_users.id = ?
+2025-01-22 03:00:48,338 INFO sqlalchemy.engine.Engine [generated in 0.00014s] ('2025-01-22 03:00:48.337405', 1)
+2025-01-22 03:00:48,338 INFO sqlalchemy.engine.Engine COMMIT
+2025-01-22 03:00:48,339 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2025-01-22 03:00:48,340 INFO sqlalchemy.engine.Engine INSERT INTO admin_logs (admin_id, action, target_type, target_id, details, ip_address) VALUES (?, ?, ?, ?, ?, ?) RETURNING id, created_at
+2025-01-22 03:00:48,340 INFO sqlalchemy.engine.Engine [generated in 0.00013s] (1, 'login', 'admin', '1', '管理员登录成功', None)
+2025-01-22 03:00:48,341 INFO sqlalchemy.engine.Engine COMMIT
+------------------------------ Captured log call -------------------------------
+INFO     sqlalchemy.engine.Engine:base.py:2699 BEGIN (implicit)
+INFO     sqlalchemy.engine.Engine:base.py:1843 SELECT admin_users.id, admin_users.username, admin_users.password_hash, admin_users.role, admin_users.is_active, admin_users.last_login, admin_users.created_at, admin_users.updated_at 
+FROM admin_users 
+WHERE admin_users.username = ?
+INFO     sqlalchemy.engine.Engine:base.py:1843 [generated in 0.00014s] ('test_admin',)
+INFO     sqlalchemy.engine.Engine:base.py:1843 SELECT admin_users.is_active 
+FROM admin_users 
+WHERE admin_users.id = ?
+INFO     sqlalchemy.engine.Engine:base.py:1843 [generated in 0.00013s] (1,)
+INFO     sqlalchemy.engine.Engine:base.py:1843 UPDATE admin_users SET last_login=? WHERE admin_users.id = ?
+INFO     sqlalchemy.engine.Engine:base.py:1843 [generated in 0.00014s] ('2025-01-22 03:00:48.337405', 1)
+INFO     sqlalchemy.engine.Engine:base.py:2705 COMMIT
+INFO     sqlalchemy.engine.Engine:base.py:2699 BEGIN (implicit)
+INFO     sqlalchemy.engine.Engine:base.py:1843 INSERT INTO admin_logs (admin_id, action, target_type, target_id, details, ip_address) VALUES (?, ?, ?, ?, ?, ?) RETURNING id, created_at
+INFO     sqlalchemy.engine.Engine:base.py:1843 [generated in 0.00013s] (1, 'login', 'admin', '1', '管理员登录成功', None)
+INFO     sqlalchemy.engine.Engine:base.py:2705 COMMIT
+--------------------------- Captured stdout teardown ---------------------------
+2025-01-22 03:00:48,561 INFO sqlalchemy.engine.Engine ROLLBACK
+2025-01-22 03:00:48,562 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2025-01-22 03:00:48,562 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("users")
+2025-01-22 03:00:48,562 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-01-22 03:00:48,563 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("point_records")
+2025-01-22 03:00:48,563 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-01-22 03:00:48,564 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("admin_users")
+2025-01-22 03:00:48,564 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-01-22 03:00:48,565 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("admin_logs")
+2025-01-22 03:00:48,565 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-01-22 03:00:48,565 INFO sqlalchemy.engine.Engine 
+DROP TABLE admin_logs
+2025-01-22 03:00:48,565 INFO sqlalchemy.engine.Engine [no key 0.00008s] ()
+2025-01-22 03:00:48,566 INFO sqlalchemy.engine.Engine 
+DROP TABLE admin_users
+2025-01-22 03:00:48,566 INFO sqlalchemy.engine.Engine [no key 0.00008s] ()
+2025-01-22 03:00:48,567 INFO sqlalchemy.engine.Engine 
+DROP TABLE point_records
+2025-01-22 03:00:48,567 INFO sqlalchemy.engine.Engine [no key 0.00008s] ()
+2025-01-22 03:00:48,567 INFO sqlalchemy.engine.Engine 
+DROP TABLE users
+2025-01-22 03:00:48,567 INFO sqlalchemy.engine.Engine [no key 0.00007s] ()
+2025-01-22 03:00:48,568 INFO sqlalchemy.engine.Engine COMMIT
+---------------------------- Captured log teardown -----------------------------
+INFO     sqlalchemy.engine.Engine:base.py:2702 ROLLBACK
+INFO     sqlalchemy.engine.Engine:base.py:2699 BEGIN (implicit)
+INFO     sqlalchemy.engine.Engine:base.py:1843 PRAGMA main.table_info("users")
+INFO     sqlalchemy.engine.Engine:base.py:1843 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 PRAGMA main.table_info("point_records")
+INFO     sqlalchemy.engine.Engine:base.py:1843 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 PRAGMA main.table_info("admin_users")
+INFO     sqlalchemy.engine.Engine:base.py:1843 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 PRAGMA main.table_info("admin_logs")
+INFO     sqlalchemy.engine.Engine:base.py:1843 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 
+DROP TABLE admin_logs
+INFO     sqlalchemy.engine.Engine:base.py:1843 [no key 0.00008s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 
+DROP TABLE admin_users
+INFO     sqlalchemy.engine.Engine:base.py:1843 [no key 0.00008s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 
+DROP TABLE point_records
+INFO     sqlalchemy.engine.Engine:base.py:1843 [no key 0.00008s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 
+DROP TABLE users
+INFO     sqlalchemy.engine.Engine:base.py:1843 [no key 0.00007s] ()
+INFO     sqlalchemy.engine.Engine:base.py:2705 COMMIT
+_____________________________ test_get_admin_info ______________________________
+
+client = <httpx.AsyncClient object at 0x7f7b05274e60>
+test_db = <sqlalchemy.ext.asyncio.session.AsyncSession object at 0x7f7b0470d4c0>
+test_admin = <app.models.admin.AdminUser object at 0x7f7b0470dc70>
+
+    @pytest.mark.asyncio
+    async def test_get_admin_info(client, test_db, test_admin):
+        """测试获取管理员信息"""
+        print("\n=== 开始测试获取管理员信息 ===")
+        print(f"测试管理员ID: {test_admin.id}")
+        print(f"测试管理员用户名: {test_admin.username}")
+    
+        # 先登录获取token
+        print("\n尝试登录...")
+>       login_response = await client.post(
+            "/admin/login",
+            headers={"Content-Type": "application/x-www-form-urlencoded"},
+            data={
+                "username": "test_admin",
+                "password": "testpass123",
+                "grant_type": "password"
+            }
+        )
+
+tests/test_admin_auth.py:77: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../.pyenv/versions/3.12.8/lib/python3.12/site-packages/httpx/_client.py:1859: in post
+    return await self.request(
+../.pyenv/versions/3.12.8/lib/python3.12/site-packages/httpx/_client.py:1540: in request
+    return await self.send(request, auth=auth, follow_redirects=follow_redirects)
+../.pyenv/versions/3.12.8/lib/python3.12/site-packages/httpx/_client.py:1629: in send
+    response = await self._send_handling_auth(
+../.pyenv/versions/3.12.8/lib/python3.12/site-packages/httpx/_client.py:1657: in _send_handling_auth
+    response = await self._send_handling_redirects(
+../.pyenv/versions/3.12.8/lib/python3.12/site-packages/httpx/_client.py:1694: in _send_handling_redirects
+    response = await self._send_single_request(request)
+../.pyenv/versions/3.12.8/lib/python3.12/site-packages/httpx/_client.py:1730: in _send_single_request
+    response = await transport.handle_async_request(request)
+../.pyenv/versions/3.12.8/lib/python3.12/site-packages/httpx/_transports/asgi.py:170: in handle_async_request
+    await self.app(scope, receive, send)
+../.pyenv/versions/3.12.8/lib/python3.12/site-packages/fastapi/applications.py:1054: in __call__
+    await super().__call__(scope, receive, send)
+../.pyenv/versions/3.12.8/lib/python3.12/site-packages/starlette/applications.py:113: in __call__
+    await self.middleware_stack(scope, receive, send)
+../.pyenv/versions/3.12.8/lib/python3.12/site-packages/starlette/middleware/errors.py:187: in __call__
+    raise exc
+../.pyenv/versions/3.12.8/lib/python3.12/site-packages/starlette/middleware/errors.py:165: in __call__
+    await self.app(scope, receive, _send)
+../.pyenv/versions/3.12.8/lib/python3.12/site-packages/starlette/middleware/exceptions.py:62: in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+../.pyenv/versions/3.12.8/lib/python3.12/site-packages/starlette/_exception_handler.py:53: in wrapped_app
+    raise exc
+../.pyenv/versions/3.12.8/lib/python3.12/site-packages/starlette/_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+../.pyenv/versions/3.12.8/lib/python3.12/site-packages/starlette/routing.py:715: in __call__
+    await self.middleware_stack(scope, receive, send)
+../.pyenv/versions/3.12.8/lib/python3.12/site-packages/starlette/routing.py:735: in app
+    await route.handle(scope, receive, send)
+../.pyenv/versions/3.12.8/lib/python3.12/site-packages/starlette/routing.py:288: in handle
+    await self.app(scope, receive, send)
+../.pyenv/versions/3.12.8/lib/python3.12/site-packages/starlette/routing.py:76: in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+../.pyenv/versions/3.12.8/lib/python3.12/site-packages/starlette/_exception_handler.py:53: in wrapped_app
+    raise exc
+../.pyenv/versions/3.12.8/lib/python3.12/site-packages/starlette/_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+../.pyenv/versions/3.12.8/lib/python3.12/site-packages/starlette/routing.py:73: in app
+    response = await f(request)
+../.pyenv/versions/3.12.8/lib/python3.12/site-packages/fastapi/routing.py:327: in app
+    content = await serialize_response(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    async def serialize_response(
+        *,
+        field: Optional[ModelField] = None,
+        response_content: Any,
+        include: Optional[IncEx] = None,
+        exclude: Optional[IncEx] = None,
+        by_alias: bool = True,
+        exclude_unset: bool = False,
+        exclude_defaults: bool = False,
+        exclude_none: bool = False,
+        is_coroutine: bool = True,
+    ) -> Any:
+        if field:
+            errors = []
+            if not hasattr(field, "serialize"):
+                # pydantic v1
+                response_content = _prepare_response_content(
+                    response_content,
+                    exclude_unset=exclude_unset,
+                    exclude_defaults=exclude_defaults,
+                    exclude_none=exclude_none,
+                )
+            if is_coroutine:
+                value, errors_ = field.validate(response_content, {}, loc=("response",))
+            else:
+                value, errors_ = await run_in_threadpool(
+                    field.validate, response_content, {}, loc=("response",)
+                )
+            if isinstance(errors_, list):
+                errors.extend(errors_)
+            elif errors_:
+                errors.append(errors_)
+            if errors:
+>               raise ResponseValidationError(
+                    errors=_normalize_errors(errors), body=response_content
+                )
+E               fastapi.exceptions.ResponseValidationError: 1 validation errors:
+E                 {'type': 'missing', 'loc': ('response', 'access_token'), 'msg': 'Field required', 'input': {'code': 0, 'message': '登录成功', 'data': Token(access_token='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZXhwIjoxNzM3NTE2NjQ5fQ.Us6udbFuDu5KmFjTEaj1W5AQJQD002xVNd8q2BgmOu4', token_type='bearer')}}
+
+../.pyenv/versions/3.12.8/lib/python3.12/site-packages/fastapi/routing.py:176: ResponseValidationError
+---------------------------- Captured stdout setup -----------------------------
+2025-01-22 03:00:49,109 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2025-01-22 03:00:49,110 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("users")
+2025-01-22 03:00:49,110 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-01-22 03:00:49,110 INFO sqlalchemy.engine.Engine PRAGMA temp.table_info("users")
+2025-01-22 03:00:49,110 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-01-22 03:00:49,111 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("point_records")
+2025-01-22 03:00:49,111 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-01-22 03:00:49,111 INFO sqlalchemy.engine.Engine PRAGMA temp.table_info("point_records")
+2025-01-22 03:00:49,112 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-01-22 03:00:49,112 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("admin_users")
+2025-01-22 03:00:49,112 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-01-22 03:00:49,113 INFO sqlalchemy.engine.Engine PRAGMA temp.table_info("admin_users")
+2025-01-22 03:00:49,113 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-01-22 03:00:49,113 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("admin_logs")
+2025-01-22 03:00:49,113 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-01-22 03:00:49,114 INFO sqlalchemy.engine.Engine PRAGMA temp.table_info("admin_logs")
+2025-01-22 03:00:49,114 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-01-22 03:00:49,114 INFO sqlalchemy.engine.Engine 
+CREATE TABLE users (
+	id INTEGER NOT NULL, 
+	telegram_id VARCHAR(32) NOT NULL, 
+	email VARCHAR(128), 
+	status INTEGER, 
+	points INTEGER, 
+	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL, 
+	updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL, 
+	PRIMARY KEY (id), 
+	UNIQUE (telegram_id), 
+	UNIQUE (email)
+)
+
+
+2025-01-22 03:00:49,115 INFO sqlalchemy.engine.Engine [no key 0.00008s] ()
+2025-01-22 03:00:49,115 INFO sqlalchemy.engine.Engine 
+CREATE TABLE point_records (
+	id INTEGER NOT NULL, 
+	user_id INTEGER NOT NULL, 
+	points INTEGER NOT NULL, 
+	type INTEGER NOT NULL, 
+	description VARCHAR(255), 
+	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL, 
+	PRIMARY KEY (id)
+)
+
+
+2025-01-22 03:00:49,115 INFO sqlalchemy.engine.Engine [no key 0.00007s] ()
+2025-01-22 03:00:49,116 INFO sqlalchemy.engine.Engine 
+CREATE TABLE admin_users (
+	id INTEGER NOT NULL, 
+	username VARCHAR(50) NOT NULL, 
+	password_hash VARCHAR(255) NOT NULL, 
+	role VARCHAR(10) NOT NULL, 
+	is_active BOOLEAN, 
+	last_login TIMESTAMP, 
+	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL, 
+	updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL, 
+	PRIMARY KEY (id), 
+	UNIQUE (username)
+)
+
+
+2025-01-22 03:00:49,116 INFO sqlalchemy.engine.Engine [no key 0.00009s] ()
+2025-01-22 03:00:49,116 INFO sqlalchemy.engine.Engine 
+CREATE TABLE admin_logs (
+	id INTEGER NOT NULL, 
+	admin_id INTEGER NOT NULL, 
+	action VARCHAR(50) NOT NULL, 
+	target_type VARCHAR(50) NOT NULL, 
+	target_id VARCHAR(50) NOT NULL, 
+	details VARCHAR(500), 
+	ip_address VARCHAR(50), 
+	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL, 
+	PRIMARY KEY (id), 
+	FOREIGN KEY(admin_id) REFERENCES admin_users (id)
+)
+
+
+2025-01-22 03:00:49,117 INFO sqlalchemy.engine.Engine [no key 0.00007s] ()
+2025-01-22 03:00:49,117 INFO sqlalchemy.engine.Engine COMMIT
+2025-01-22 03:00:49,374 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2025-01-22 03:00:49,374 INFO sqlalchemy.engine.Engine INSERT INTO admin_users (username, password_hash, role, is_active, last_login) VALUES (?, ?, ?, ?, ?) RETURNING id, created_at, updated_at
+2025-01-22 03:00:49,374 INFO sqlalchemy.engine.Engine [cached since 1.355s ago] ('test_admin', '$2b$12$KRfmATVnGjUTA2jwHtMHreSM7sp6dEgsMXl5Atj895Ltt0xC3dahu', 'SUPERADMIN', 1, None)
+2025-01-22 03:00:49,375 INFO sqlalchemy.engine.Engine COMMIT
+2025-01-22 03:00:49,376 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2025-01-22 03:00:49,376 INFO sqlalchemy.engine.Engine SELECT admin_users.id, admin_users.username, admin_users.password_hash, admin_users.role, admin_users.is_active, admin_users.last_login, admin_users.created_at, admin_users.updated_at 
+FROM admin_users 
+WHERE admin_users.id = ?
+2025-01-22 03:00:49,376 INFO sqlalchemy.engine.Engine [cached since 1.354s ago] (1,)
+------------------------------ Captured log setup ------------------------------
+INFO     sqlalchemy.engine.Engine:base.py:2699 BEGIN (implicit)
+INFO     sqlalchemy.engine.Engine:base.py:1843 PRAGMA main.table_info("users")
+INFO     sqlalchemy.engine.Engine:base.py:1843 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 PRAGMA temp.table_info("users")
+INFO     sqlalchemy.engine.Engine:base.py:1843 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 PRAGMA main.table_info("point_records")
+INFO     sqlalchemy.engine.Engine:base.py:1843 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 PRAGMA temp.table_info("point_records")
+INFO     sqlalchemy.engine.Engine:base.py:1843 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 PRAGMA main.table_info("admin_users")
+INFO     sqlalchemy.engine.Engine:base.py:1843 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 PRAGMA temp.table_info("admin_users")
+INFO     sqlalchemy.engine.Engine:base.py:1843 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 PRAGMA main.table_info("admin_logs")
+INFO     sqlalchemy.engine.Engine:base.py:1843 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 PRAGMA temp.table_info("admin_logs")
+INFO     sqlalchemy.engine.Engine:base.py:1843 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 
+CREATE TABLE users (
+	id INTEGER NOT NULL, 
+	telegram_id VARCHAR(32) NOT NULL, 
+	email VARCHAR(128), 
+	status INTEGER, 
+	points INTEGER, 
+	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL, 
+	updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL, 
+	PRIMARY KEY (id), 
+	UNIQUE (telegram_id), 
+	UNIQUE (email)
+)
+
+
+INFO     sqlalchemy.engine.Engine:base.py:1843 [no key 0.00008s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 
+CREATE TABLE point_records (
+	id INTEGER NOT NULL, 
+	user_id INTEGER NOT NULL, 
+	points INTEGER NOT NULL, 
+	type INTEGER NOT NULL, 
+	description VARCHAR(255), 
+	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL, 
+	PRIMARY KEY (id)
+)
+
+
+INFO     sqlalchemy.engine.Engine:base.py:1843 [no key 0.00007s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 
+CREATE TABLE admin_users (
+	id INTEGER NOT NULL, 
+	username VARCHAR(50) NOT NULL, 
+	password_hash VARCHAR(255) NOT NULL, 
+	role VARCHAR(10) NOT NULL, 
+	is_active BOOLEAN, 
+	last_login TIMESTAMP, 
+	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL, 
+	updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL, 
+	PRIMARY KEY (id), 
+	UNIQUE (username)
+)
+
+
+INFO     sqlalchemy.engine.Engine:base.py:1843 [no key 0.00009s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 
+CREATE TABLE admin_logs (
+	id INTEGER NOT NULL, 
+	admin_id INTEGER NOT NULL, 
+	action VARCHAR(50) NOT NULL, 
+	target_type VARCHAR(50) NOT NULL, 
+	target_id VARCHAR(50) NOT NULL, 
+	details VARCHAR(500), 
+	ip_address VARCHAR(50), 
+	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL, 
+	PRIMARY KEY (id), 
+	FOREIGN KEY(admin_id) REFERENCES admin_users (id)
+)
+
+
+INFO     sqlalchemy.engine.Engine:base.py:1843 [no key 0.00007s] ()
+INFO     sqlalchemy.engine.Engine:base.py:2705 COMMIT
+INFO     sqlalchemy.engine.Engine:base.py:2699 BEGIN (implicit)
+INFO     sqlalchemy.engine.Engine:base.py:1843 INSERT INTO admin_users (username, password_hash, role, is_active, last_login) VALUES (?, ?, ?, ?, ?) RETURNING id, created_at, updated_at
+INFO     sqlalchemy.engine.Engine:base.py:1843 [cached since 1.355s ago] ('test_admin', '$2b$12$KRfmATVnGjUTA2jwHtMHreSM7sp6dEgsMXl5Atj895Ltt0xC3dahu', 'SUPERADMIN', 1, None)
+INFO     sqlalchemy.engine.Engine:base.py:2705 COMMIT
+INFO     sqlalchemy.engine.Engine:base.py:2699 BEGIN (implicit)
+INFO     sqlalchemy.engine.Engine:base.py:1843 SELECT admin_users.id, admin_users.username, admin_users.password_hash, admin_users.role, admin_users.is_active, admin_users.last_login, admin_users.created_at, admin_users.updated_at 
+FROM admin_users 
+WHERE admin_users.id = ?
+INFO     sqlalchemy.engine.Engine:base.py:1843 [cached since 1.354s ago] (1,)
+----------------------------- Captured stdout call -----------------------------
+
+=== 开始测试获取管理员信息 ===
+测试管理员ID: 1
+测试管理员用户名: test_admin
+
+尝试登录...
+2025-01-22 03:00:49,380 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2025-01-22 03:00:49,381 INFO sqlalchemy.engine.Engine SELECT admin_users.id, admin_users.username, admin_users.password_hash, admin_users.role, admin_users.is_active, admin_users.last_login, admin_users.created_at, admin_users.updated_at 
+FROM admin_users 
+WHERE admin_users.username = ?
+2025-01-22 03:00:49,381 INFO sqlalchemy.engine.Engine [cached since 1.3s ago] ('test_admin',)
+2025-01-22 03:00:49,637 INFO sqlalchemy.engine.Engine SELECT admin_users.is_active 
+FROM admin_users 
+WHERE admin_users.id = ?
+2025-01-22 03:00:49,637 INFO sqlalchemy.engine.Engine [cached since 1.303s ago] (1,)
+2025-01-22 03:00:49,639 INFO sqlalchemy.engine.Engine UPDATE admin_users SET last_login=? WHERE admin_users.id = ?
+2025-01-22 03:00:49,639 INFO sqlalchemy.engine.Engine [cached since 1.301s ago] ('2025-01-22 03:00:49.638851', 1)
+2025-01-22 03:00:49,639 INFO sqlalchemy.engine.Engine COMMIT
+2025-01-22 03:00:49,640 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2025-01-22 03:00:49,640 INFO sqlalchemy.engine.Engine INSERT INTO admin_logs (admin_id, action, target_type, target_id, details, ip_address) VALUES (?, ?, ?, ?, ?, ?) RETURNING id, created_at
+2025-01-22 03:00:49,640 INFO sqlalchemy.engine.Engine [cached since 1.3s ago] (1, 'login', 'admin', '1', '管理员登录成功', None)
+2025-01-22 03:00:49,641 INFO sqlalchemy.engine.Engine COMMIT
+------------------------------ Captured log call -------------------------------
+INFO     sqlalchemy.engine.Engine:base.py:2699 BEGIN (implicit)
+INFO     sqlalchemy.engine.Engine:base.py:1843 SELECT admin_users.id, admin_users.username, admin_users.password_hash, admin_users.role, admin_users.is_active, admin_users.last_login, admin_users.created_at, admin_users.updated_at 
+FROM admin_users 
+WHERE admin_users.username = ?
+INFO     sqlalchemy.engine.Engine:base.py:1843 [cached since 1.3s ago] ('test_admin',)
+INFO     sqlalchemy.engine.Engine:base.py:1843 SELECT admin_users.is_active 
+FROM admin_users 
+WHERE admin_users.id = ?
+INFO     sqlalchemy.engine.Engine:base.py:1843 [cached since 1.303s ago] (1,)
+INFO     sqlalchemy.engine.Engine:base.py:1843 UPDATE admin_users SET last_login=? WHERE admin_users.id = ?
+INFO     sqlalchemy.engine.Engine:base.py:1843 [cached since 1.301s ago] ('2025-01-22 03:00:49.638851', 1)
+INFO     sqlalchemy.engine.Engine:base.py:2705 COMMIT
+INFO     sqlalchemy.engine.Engine:base.py:2699 BEGIN (implicit)
+INFO     sqlalchemy.engine.Engine:base.py:1843 INSERT INTO admin_logs (admin_id, action, target_type, target_id, details, ip_address) VALUES (?, ?, ?, ?, ?, ?) RETURNING id, created_at
+INFO     sqlalchemy.engine.Engine:base.py:1843 [cached since 1.3s ago] (1, 'login', 'admin', '1', '管理员登录成功', None)
+INFO     sqlalchemy.engine.Engine:base.py:2705 COMMIT
+--------------------------- Captured stdout teardown ---------------------------
+2025-01-22 03:00:49,805 INFO sqlalchemy.engine.Engine ROLLBACK
+2025-01-22 03:00:49,806 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2025-01-22 03:00:49,806 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("users")
+2025-01-22 03:00:49,806 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-01-22 03:00:49,807 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("point_records")
+2025-01-22 03:00:49,807 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-01-22 03:00:49,808 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("admin_users")
+2025-01-22 03:00:49,808 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-01-22 03:00:49,808 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("admin_logs")
+2025-01-22 03:00:49,808 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-01-22 03:00:49,809 INFO sqlalchemy.engine.Engine 
+DROP TABLE admin_logs
+2025-01-22 03:00:49,809 INFO sqlalchemy.engine.Engine [no key 0.00008s] ()
+2025-01-22 03:00:49,810 INFO sqlalchemy.engine.Engine 
+DROP TABLE admin_users
+2025-01-22 03:00:49,810 INFO sqlalchemy.engine.Engine [no key 0.00007s] ()
+2025-01-22 03:00:49,810 INFO sqlalchemy.engine.Engine 
+DROP TABLE point_records
+2025-01-22 03:00:49,810 INFO sqlalchemy.engine.Engine [no key 0.00007s] ()
+2025-01-22 03:00:49,811 INFO sqlalchemy.engine.Engine 
+DROP TABLE users
+2025-01-22 03:00:49,811 INFO sqlalchemy.engine.Engine [no key 0.00007s] ()
+2025-01-22 03:00:49,811 INFO sqlalchemy.engine.Engine COMMIT
+---------------------------- Captured log teardown -----------------------------
+INFO     sqlalchemy.engine.Engine:base.py:2702 ROLLBACK
+INFO     sqlalchemy.engine.Engine:base.py:2699 BEGIN (implicit)
+INFO     sqlalchemy.engine.Engine:base.py:1843 PRAGMA main.table_info("users")
+INFO     sqlalchemy.engine.Engine:base.py:1843 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 PRAGMA main.table_info("point_records")
+INFO     sqlalchemy.engine.Engine:base.py:1843 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 PRAGMA main.table_info("admin_users")
+INFO     sqlalchemy.engine.Engine:base.py:1843 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 PRAGMA main.table_info("admin_logs")
+INFO     sqlalchemy.engine.Engine:base.py:1843 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 
+DROP TABLE admin_logs
+INFO     sqlalchemy.engine.Engine:base.py:1843 [no key 0.00008s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 
+DROP TABLE admin_users
+INFO     sqlalchemy.engine.Engine:base.py:1843 [no key 0.00007s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 
+DROP TABLE point_records
+INFO     sqlalchemy.engine.Engine:base.py:1843 [no key 0.00007s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 
+DROP TABLE users
+INFO     sqlalchemy.engine.Engine:base.py:1843 [no key 0.00007s] ()
+INFO     sqlalchemy.engine.Engine:base.py:2705 COMMIT
+_________________________________ test_logout __________________________________
+
+client = <httpx.AsyncClient object at 0x7f7b05236f30>
+test_db = <sqlalchemy.ext.asyncio.session.AsyncSession object at 0x7f7b0473eba0>
+test_admin = <app.models.admin.AdminUser object at 0x7f7b0473d9a0>
+
+    @pytest.mark.asyncio
+    async def test_logout(client, test_db, test_admin):
+        """测试注销"""
+        # 先登录获取token
+>       login_response = await client.post(
+            "/admin/login",
+            headers={"Content-Type": "application/x-www-form-urlencoded"},
+            data={
+                "username": "test_admin",
+                "password": "testpass123",
+                "grant_type": "password"
+            }
+        )
+
+tests/test_admin_auth.py:115: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../.pyenv/versions/3.12.8/lib/python3.12/site-packages/httpx/_client.py:1859: in post
+    return await self.request(
+../.pyenv/versions/3.12.8/lib/python3.12/site-packages/httpx/_client.py:1540: in request
+    return await self.send(request, auth=auth, follow_redirects=follow_redirects)
+../.pyenv/versions/3.12.8/lib/python3.12/site-packages/httpx/_client.py:1629: in send
+    response = await self._send_handling_auth(
+../.pyenv/versions/3.12.8/lib/python3.12/site-packages/httpx/_client.py:1657: in _send_handling_auth
+    response = await self._send_handling_redirects(
+../.pyenv/versions/3.12.8/lib/python3.12/site-packages/httpx/_client.py:1694: in _send_handling_redirects
+    response = await self._send_single_request(request)
+../.pyenv/versions/3.12.8/lib/python3.12/site-packages/httpx/_client.py:1730: in _send_single_request
+    response = await transport.handle_async_request(request)
+../.pyenv/versions/3.12.8/lib/python3.12/site-packages/httpx/_transports/asgi.py:170: in handle_async_request
+    await self.app(scope, receive, send)
+../.pyenv/versions/3.12.8/lib/python3.12/site-packages/fastapi/applications.py:1054: in __call__
+    await super().__call__(scope, receive, send)
+../.pyenv/versions/3.12.8/lib/python3.12/site-packages/starlette/applications.py:113: in __call__
+    await self.middleware_stack(scope, receive, send)
+../.pyenv/versions/3.12.8/lib/python3.12/site-packages/starlette/middleware/errors.py:187: in __call__
+    raise exc
+../.pyenv/versions/3.12.8/lib/python3.12/site-packages/starlette/middleware/errors.py:165: in __call__
+    await self.app(scope, receive, _send)
+../.pyenv/versions/3.12.8/lib/python3.12/site-packages/starlette/middleware/exceptions.py:62: in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+../.pyenv/versions/3.12.8/lib/python3.12/site-packages/starlette/_exception_handler.py:53: in wrapped_app
+    raise exc
+../.pyenv/versions/3.12.8/lib/python3.12/site-packages/starlette/_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+../.pyenv/versions/3.12.8/lib/python3.12/site-packages/starlette/routing.py:715: in __call__
+    await self.middleware_stack(scope, receive, send)
+../.pyenv/versions/3.12.8/lib/python3.12/site-packages/starlette/routing.py:735: in app
+    await route.handle(scope, receive, send)
+../.pyenv/versions/3.12.8/lib/python3.12/site-packages/starlette/routing.py:288: in handle
+    await self.app(scope, receive, send)
+../.pyenv/versions/3.12.8/lib/python3.12/site-packages/starlette/routing.py:76: in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+../.pyenv/versions/3.12.8/lib/python3.12/site-packages/starlette/_exception_handler.py:53: in wrapped_app
+    raise exc
+../.pyenv/versions/3.12.8/lib/python3.12/site-packages/starlette/_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+../.pyenv/versions/3.12.8/lib/python3.12/site-packages/starlette/routing.py:73: in app
+    response = await f(request)
+../.pyenv/versions/3.12.8/lib/python3.12/site-packages/fastapi/routing.py:327: in app
+    content = await serialize_response(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    async def serialize_response(
+        *,
+        field: Optional[ModelField] = None,
+        response_content: Any,
+        include: Optional[IncEx] = None,
+        exclude: Optional[IncEx] = None,
+        by_alias: bool = True,
+        exclude_unset: bool = False,
+        exclude_defaults: bool = False,
+        exclude_none: bool = False,
+        is_coroutine: bool = True,
+    ) -> Any:
+        if field:
+            errors = []
+            if not hasattr(field, "serialize"):
+                # pydantic v1
+                response_content = _prepare_response_content(
+                    response_content,
+                    exclude_unset=exclude_unset,
+                    exclude_defaults=exclude_defaults,
+                    exclude_none=exclude_none,
+                )
+            if is_coroutine:
+                value, errors_ = field.validate(response_content, {}, loc=("response",))
+            else:
+                value, errors_ = await run_in_threadpool(
+                    field.validate, response_content, {}, loc=("response",)
+                )
+            if isinstance(errors_, list):
+                errors.extend(errors_)
+            elif errors_:
+                errors.append(errors_)
+            if errors:
+>               raise ResponseValidationError(
+                    errors=_normalize_errors(errors), body=response_content
+                )
+E               fastapi.exceptions.ResponseValidationError: 1 validation errors:
+E                 {'type': 'missing', 'loc': ('response', 'access_token'), 'msg': 'Field required', 'input': {'code': 0, 'message': '登录成功', 'data': Token(access_token='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZXhwIjoxNzM3NTE2NjUwfQ._rwMb3QMpAfhPSJZfHNnJ9riUJlFp3gNrdf4tLzV9o8', token_type='bearer')}}
+
+../.pyenv/versions/3.12.8/lib/python3.12/site-packages/fastapi/routing.py:176: ResponseValidationError
+---------------------------- Captured stdout setup -----------------------------
+2025-01-22 03:00:49,813 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2025-01-22 03:00:49,813 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("users")
+2025-01-22 03:00:49,813 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-01-22 03:00:49,814 INFO sqlalchemy.engine.Engine PRAGMA temp.table_info("users")
+2025-01-22 03:00:49,814 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-01-22 03:00:49,814 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("point_records")
+2025-01-22 03:00:49,814 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-01-22 03:00:49,815 INFO sqlalchemy.engine.Engine PRAGMA temp.table_info("point_records")
+2025-01-22 03:00:49,815 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-01-22 03:00:49,815 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("admin_users")
+2025-01-22 03:00:49,815 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-01-22 03:00:49,816 INFO sqlalchemy.engine.Engine PRAGMA temp.table_info("admin_users")
+2025-01-22 03:00:49,816 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-01-22 03:00:49,816 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("admin_logs")
+2025-01-22 03:00:49,816 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-01-22 03:00:49,817 INFO sqlalchemy.engine.Engine PRAGMA temp.table_info("admin_logs")
+2025-01-22 03:00:49,817 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-01-22 03:00:49,817 INFO sqlalchemy.engine.Engine 
+CREATE TABLE users (
+	id INTEGER NOT NULL, 
+	telegram_id VARCHAR(32) NOT NULL, 
+	email VARCHAR(128), 
+	status INTEGER, 
+	points INTEGER, 
+	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL, 
+	updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL, 
+	PRIMARY KEY (id), 
+	UNIQUE (telegram_id), 
+	UNIQUE (email)
+)
+
+
+2025-01-22 03:00:49,818 INFO sqlalchemy.engine.Engine [no key 0.00008s] ()
+2025-01-22 03:00:49,818 INFO sqlalchemy.engine.Engine 
+CREATE TABLE point_records (
+	id INTEGER NOT NULL, 
+	user_id INTEGER NOT NULL, 
+	points INTEGER NOT NULL, 
+	type INTEGER NOT NULL, 
+	description VARCHAR(255), 
+	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL, 
+	PRIMARY KEY (id)
+)
+
+
+2025-01-22 03:00:49,818 INFO sqlalchemy.engine.Engine [no key 0.00007s] ()
+2025-01-22 03:00:49,819 INFO sqlalchemy.engine.Engine 
+CREATE TABLE admin_users (
+	id INTEGER NOT NULL, 
+	username VARCHAR(50) NOT NULL, 
+	password_hash VARCHAR(255) NOT NULL, 
+	role VARCHAR(10) NOT NULL, 
+	is_active BOOLEAN, 
+	last_login TIMESTAMP, 
+	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL, 
+	updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL, 
+	PRIMARY KEY (id), 
+	UNIQUE (username)
+)
+
+
+2025-01-22 03:00:49,819 INFO sqlalchemy.engine.Engine [no key 0.00007s] ()
+2025-01-22 03:00:49,819 INFO sqlalchemy.engine.Engine 
+CREATE TABLE admin_logs (
+	id INTEGER NOT NULL, 
+	admin_id INTEGER NOT NULL, 
+	action VARCHAR(50) NOT NULL, 
+	target_type VARCHAR(50) NOT NULL, 
+	target_id VARCHAR(50) NOT NULL, 
+	details VARCHAR(500), 
+	ip_address VARCHAR(50), 
+	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL, 
+	PRIMARY KEY (id), 
+	FOREIGN KEY(admin_id) REFERENCES admin_users (id)
+)
+
+
+2025-01-22 03:00:49,819 INFO sqlalchemy.engine.Engine [no key 0.00007s] ()
+2025-01-22 03:00:49,820 INFO sqlalchemy.engine.Engine COMMIT
+2025-01-22 03:00:50,075 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2025-01-22 03:00:50,075 INFO sqlalchemy.engine.Engine INSERT INTO admin_users (username, password_hash, role, is_active, last_login) VALUES (?, ?, ?, ?, ?) RETURNING id, created_at, updated_at
+2025-01-22 03:00:50,076 INFO sqlalchemy.engine.Engine [cached since 2.056s ago] ('test_admin', '$2b$12$rgAlEz1uoXvWkPUOk.dZnO32EnVS4gTEFO9qF4J4wpvbDKcnXXB.m', 'SUPERADMIN', 1, None)
+2025-01-22 03:00:50,077 INFO sqlalchemy.engine.Engine COMMIT
+2025-01-22 03:00:50,077 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2025-01-22 03:00:50,077 INFO sqlalchemy.engine.Engine SELECT admin_users.id, admin_users.username, admin_users.password_hash, admin_users.role, admin_users.is_active, admin_users.last_login, admin_users.created_at, admin_users.updated_at 
+FROM admin_users 
+WHERE admin_users.id = ?
+2025-01-22 03:00:50,077 INFO sqlalchemy.engine.Engine [cached since 2.056s ago] (1,)
+------------------------------ Captured log setup ------------------------------
+INFO     sqlalchemy.engine.Engine:base.py:2699 BEGIN (implicit)
+INFO     sqlalchemy.engine.Engine:base.py:1843 PRAGMA main.table_info("users")
+INFO     sqlalchemy.engine.Engine:base.py:1843 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 PRAGMA temp.table_info("users")
+INFO     sqlalchemy.engine.Engine:base.py:1843 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 PRAGMA main.table_info("point_records")
+INFO     sqlalchemy.engine.Engine:base.py:1843 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 PRAGMA temp.table_info("point_records")
+INFO     sqlalchemy.engine.Engine:base.py:1843 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 PRAGMA main.table_info("admin_users")
+INFO     sqlalchemy.engine.Engine:base.py:1843 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 PRAGMA temp.table_info("admin_users")
+INFO     sqlalchemy.engine.Engine:base.py:1843 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 PRAGMA main.table_info("admin_logs")
+INFO     sqlalchemy.engine.Engine:base.py:1843 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 PRAGMA temp.table_info("admin_logs")
+INFO     sqlalchemy.engine.Engine:base.py:1843 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 
+CREATE TABLE users (
+	id INTEGER NOT NULL, 
+	telegram_id VARCHAR(32) NOT NULL, 
+	email VARCHAR(128), 
+	status INTEGER, 
+	points INTEGER, 
+	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL, 
+	updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL, 
+	PRIMARY KEY (id), 
+	UNIQUE (telegram_id), 
+	UNIQUE (email)
+)
+
+
+INFO     sqlalchemy.engine.Engine:base.py:1843 [no key 0.00008s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 
+CREATE TABLE point_records (
+	id INTEGER NOT NULL, 
+	user_id INTEGER NOT NULL, 
+	points INTEGER NOT NULL, 
+	type INTEGER NOT NULL, 
+	description VARCHAR(255), 
+	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL, 
+	PRIMARY KEY (id)
+)
+
+
+INFO     sqlalchemy.engine.Engine:base.py:1843 [no key 0.00007s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 
+CREATE TABLE admin_users (
+	id INTEGER NOT NULL, 
+	username VARCHAR(50) NOT NULL, 
+	password_hash VARCHAR(255) NOT NULL, 
+	role VARCHAR(10) NOT NULL, 
+	is_active BOOLEAN, 
+	last_login TIMESTAMP, 
+	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL, 
+	updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL, 
+	PRIMARY KEY (id), 
+	UNIQUE (username)
+)
+
+
+INFO     sqlalchemy.engine.Engine:base.py:1843 [no key 0.00007s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 
+CREATE TABLE admin_logs (
+	id INTEGER NOT NULL, 
+	admin_id INTEGER NOT NULL, 
+	action VARCHAR(50) NOT NULL, 
+	target_type VARCHAR(50) NOT NULL, 
+	target_id VARCHAR(50) NOT NULL, 
+	details VARCHAR(500), 
+	ip_address VARCHAR(50), 
+	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL, 
+	PRIMARY KEY (id), 
+	FOREIGN KEY(admin_id) REFERENCES admin_users (id)
+)
+
+
+INFO     sqlalchemy.engine.Engine:base.py:1843 [no key 0.00007s] ()
+INFO     sqlalchemy.engine.Engine:base.py:2705 COMMIT
+INFO     sqlalchemy.engine.Engine:base.py:2699 BEGIN (implicit)
+INFO     sqlalchemy.engine.Engine:base.py:1843 INSERT INTO admin_users (username, password_hash, role, is_active, last_login) VALUES (?, ?, ?, ?, ?) RETURNING id, created_at, updated_at
+INFO     sqlalchemy.engine.Engine:base.py:1843 [cached since 2.056s ago] ('test_admin', '$2b$12$rgAlEz1uoXvWkPUOk.dZnO32EnVS4gTEFO9qF4J4wpvbDKcnXXB.m', 'SUPERADMIN', 1, None)
+INFO     sqlalchemy.engine.Engine:base.py:2705 COMMIT
+INFO     sqlalchemy.engine.Engine:base.py:2699 BEGIN (implicit)
+INFO     sqlalchemy.engine.Engine:base.py:1843 SELECT admin_users.id, admin_users.username, admin_users.password_hash, admin_users.role, admin_users.is_active, admin_users.last_login, admin_users.created_at, admin_users.updated_at 
+FROM admin_users 
+WHERE admin_users.id = ?
+INFO     sqlalchemy.engine.Engine:base.py:1843 [cached since 2.056s ago] (1,)
+----------------------------- Captured stdout call -----------------------------
+2025-01-22 03:00:50,082 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2025-01-22 03:00:50,083 INFO sqlalchemy.engine.Engine SELECT admin_users.id, admin_users.username, admin_users.password_hash, admin_users.role, admin_users.is_active, admin_users.last_login, admin_users.created_at, admin_users.updated_at 
+FROM admin_users 
+WHERE admin_users.username = ?
+2025-01-22 03:00:50,083 INFO sqlalchemy.engine.Engine [cached since 2.002s ago] ('test_admin',)
+2025-01-22 03:00:50,336 INFO sqlalchemy.engine.Engine SELECT admin_users.is_active 
+FROM admin_users 
+WHERE admin_users.id = ?
+2025-01-22 03:00:50,336 INFO sqlalchemy.engine.Engine [cached since 2.002s ago] (1,)
+2025-01-22 03:00:50,337 INFO sqlalchemy.engine.Engine UPDATE admin_users SET last_login=? WHERE admin_users.id = ?
+2025-01-22 03:00:50,337 INFO sqlalchemy.engine.Engine [cached since 2s ago] ('2025-01-22 03:00:50.337580', 1)
+2025-01-22 03:00:50,338 INFO sqlalchemy.engine.Engine COMMIT
+2025-01-22 03:00:50,339 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2025-01-22 03:00:50,339 INFO sqlalchemy.engine.Engine INSERT INTO admin_logs (admin_id, action, target_type, target_id, details, ip_address) VALUES (?, ?, ?, ?, ?, ?) RETURNING id, created_at
+2025-01-22 03:00:50,339 INFO sqlalchemy.engine.Engine [cached since 1.999s ago] (1, 'login', 'admin', '1', '管理员登录成功', None)
+2025-01-22 03:00:50,340 INFO sqlalchemy.engine.Engine COMMIT
+------------------------------ Captured log call -------------------------------
+INFO     sqlalchemy.engine.Engine:base.py:2699 BEGIN (implicit)
+INFO     sqlalchemy.engine.Engine:base.py:1843 SELECT admin_users.id, admin_users.username, admin_users.password_hash, admin_users.role, admin_users.is_active, admin_users.last_login, admin_users.created_at, admin_users.updated_at 
+FROM admin_users 
+WHERE admin_users.username = ?
+INFO     sqlalchemy.engine.Engine:base.py:1843 [cached since 2.002s ago] ('test_admin',)
+INFO     sqlalchemy.engine.Engine:base.py:1843 SELECT admin_users.is_active 
+FROM admin_users 
+WHERE admin_users.id = ?
+INFO     sqlalchemy.engine.Engine:base.py:1843 [cached since 2.002s ago] (1,)
+INFO     sqlalchemy.engine.Engine:base.py:1843 UPDATE admin_users SET last_login=? WHERE admin_users.id = ?
+INFO     sqlalchemy.engine.Engine:base.py:1843 [cached since 2s ago] ('2025-01-22 03:00:50.337580', 1)
+INFO     sqlalchemy.engine.Engine:base.py:2705 COMMIT
+INFO     sqlalchemy.engine.Engine:base.py:2699 BEGIN (implicit)
+INFO     sqlalchemy.engine.Engine:base.py:1843 INSERT INTO admin_logs (admin_id, action, target_type, target_id, details, ip_address) VALUES (?, ?, ?, ?, ?, ?) RETURNING id, created_at
+INFO     sqlalchemy.engine.Engine:base.py:1843 [cached since 1.999s ago] (1, 'login', 'admin', '1', '管理员登录成功', None)
+INFO     sqlalchemy.engine.Engine:base.py:2705 COMMIT
+--------------------------- Captured stdout teardown ---------------------------
+2025-01-22 03:00:50,505 INFO sqlalchemy.engine.Engine ROLLBACK
+2025-01-22 03:00:50,506 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2025-01-22 03:00:50,507 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("users")
+2025-01-22 03:00:50,507 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-01-22 03:00:50,508 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("point_records")
+2025-01-22 03:00:50,508 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-01-22 03:00:50,508 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("admin_users")
+2025-01-22 03:00:50,509 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-01-22 03:00:50,509 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("admin_logs")
+2025-01-22 03:00:50,509 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-01-22 03:00:50,510 INFO sqlalchemy.engine.Engine 
+DROP TABLE admin_logs
+2025-01-22 03:00:50,510 INFO sqlalchemy.engine.Engine [no key 0.00008s] ()
+2025-01-22 03:00:50,511 INFO sqlalchemy.engine.Engine 
+DROP TABLE admin_users
+2025-01-22 03:00:50,511 INFO sqlalchemy.engine.Engine [no key 0.00008s] ()
+2025-01-22 03:00:50,511 INFO sqlalchemy.engine.Engine 
+DROP TABLE point_records
+2025-01-22 03:00:50,511 INFO sqlalchemy.engine.Engine [no key 0.00011s] ()
+2025-01-22 03:00:50,512 INFO sqlalchemy.engine.Engine 
+DROP TABLE users
+2025-01-22 03:00:50,512 INFO sqlalchemy.engine.Engine [no key 0.00008s] ()
+2025-01-22 03:00:50,513 INFO sqlalchemy.engine.Engine COMMIT
+---------------------------- Captured log teardown -----------------------------
+INFO     sqlalchemy.engine.Engine:base.py:2702 ROLLBACK
+INFO     sqlalchemy.engine.Engine:base.py:2699 BEGIN (implicit)
+INFO     sqlalchemy.engine.Engine:base.py:1843 PRAGMA main.table_info("users")
+INFO     sqlalchemy.engine.Engine:base.py:1843 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 PRAGMA main.table_info("point_records")
+INFO     sqlalchemy.engine.Engine:base.py:1843 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 PRAGMA main.table_info("admin_users")
+INFO     sqlalchemy.engine.Engine:base.py:1843 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 PRAGMA main.table_info("admin_logs")
+INFO     sqlalchemy.engine.Engine:base.py:1843 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 
+DROP TABLE admin_logs
+INFO     sqlalchemy.engine.Engine:base.py:1843 [no key 0.00008s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 
+DROP TABLE admin_users
+INFO     sqlalchemy.engine.Engine:base.py:1843 [no key 0.00008s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 
+DROP TABLE point_records
+INFO     sqlalchemy.engine.Engine:base.py:1843 [no key 0.00011s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 
+DROP TABLE users
+INFO     sqlalchemy.engine.Engine:base.py:1843 [no key 0.00008s] ()
+INFO     sqlalchemy.engine.Engine:base.py:2705 COMMIT
+=============================== warnings summary ===============================
+app/db/database.py:35
+  /home/ubuntu/coser_bot/app/db/database.py:35: MovedIn20Warning: The ``declarative_base()`` function is now available as sqlalchemy.orm.declarative_base(). (deprecated since: 2.0) (Background on SQLAlchemy 2.0 at: https://sqlalche.me/e/b8d9)
+    Base = declarative_base()
+
+../.pyenv/versions/3.12.8/lib/python3.12/site-packages/passlib/utils/__init__.py:854
+  /home/ubuntu/.pyenv/versions/3.12.8/lib/python3.12/site-packages/passlib/utils/__init__.py:854: DeprecationWarning: 'crypt' is deprecated and slated for removal in Python 3.13
+    from crypt import crypt as _crypt
+
+../.pyenv/versions/3.12.8/lib/python3.12/site-packages/pydantic/_internal/_config.py:295
+  /home/ubuntu/.pyenv/versions/3.12.8/lib/python3.12/site-packages/pydantic/_internal/_config.py:295: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.10/migration/
+    warnings.warn(DEPRECATION_MESSAGE, DeprecationWarning)
+
+tests/test_admin_auth.py::test_login
+tests/test_admin_auth.py::test_get_admin_info
+tests/test_admin_auth.py::test_logout
+tests/test_auth.py::test_token_creation
+  /home/ubuntu/coser_bot/app/core/auth.py:49: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    expire = datetime.utcnow() + expires_delta
+
+tests/test_admin_auth.py::test_login
+tests/test_admin_auth.py::test_get_admin_info
+tests/test_admin_auth.py::test_logout
+  /home/ubuntu/coser_bot/app/routers/admin.py:73: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    ).values(last_login=datetime.utcnow())
+
+tests/test_admin_endpoints.py::test_ban_user
+tests/test_admin_endpoints.py::test_unban_user
+tests/test_admin_endpoints.py::test_adjust_points
+tests/test_admin_endpoints.py::test_get_user_stats
+tests/test_auth.py::test_token_blacklist
+  /home/ubuntu/coser_bot/app/core/auth.py:51: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    expire = datetime.utcnow() + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+
+tests/test_admin_endpoints.py::test_ban_user
+tests/test_admin_endpoints.py::test_unban_user
+tests/test_admin_endpoints.py::test_adjust_points
+tests/test_admin_endpoints.py::test_get_user_stats
+tests/test_auth.py::test_token_blacklist
+  /home/ubuntu/.pyenv/versions/3.12.8/lib/python3.12/site-packages/jose/jwt.py:311: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    now = timegm(datetime.utcnow().utctimetuple())
+
+tests/test_auth.py::test_token_blacklist
+  /home/ubuntu/coser_bot/app/core/auth.py:145: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    ttl = exp - datetime.utcnow().timestamp()
+
+tests/test_group_management.py::test_mute_user
+  /home/ubuntu/coser_bot/app/services/group_management.py:58: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    until_date = datetime.utcnow() + timedelta(minutes=duration)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_admin_auth.py::test_login - fastapi.exceptions.ResponseValidationError: 1 validation errors:
+FAILED tests/test_admin_auth.py::test_get_admin_info - fastapi.exceptions.ResponseValidationError: 1 validation errors:
+FAILED tests/test_admin_auth.py::test_logout - fastapi.exceptions.ResponseValidationError: 1 validation errors:
+================== 3 failed, 20 passed, 22 warnings in 6.68s ===================

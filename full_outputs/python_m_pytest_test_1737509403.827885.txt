@@ -1,0 +1,828 @@
+/home/ubuntu/coser_bot/venv/lib/python3.12/site-packages/pytest_asyncio/plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+============================= test session starts ==============================
+platform linux -- Python 3.12.8, pytest-8.3.4, pluggy-1.5.0 -- /home/ubuntu/coser_bot/venv/bin/python
+cachedir: .pytest_cache
+rootdir: /home/ubuntu/coser_bot
+configfile: pyproject.toml
+plugins: anyio-4.8.0, asyncio-0.25.2
+asyncio: mode=Mode.STRICT, asyncio_default_fixture_loop_scope=None
+collected 23 items                                                             
+
+tests/test_admin.py::test_create_admin_user PASSED                       [  4%]
+tests/test_admin.py::test_create_admin_log PASSED                        [  8%]
+tests/test_admin_auth.py::test_login PASSED                              [ 13%]
+tests/test_admin_auth.py::test_login_invalid_credentials PASSED          [ 17%]
+tests/test_admin_auth.py::test_get_admin_info FAILED                     [ 21%]
+tests/test_admin_auth.py::test_logout FAILED                             [ 26%]
+tests/test_admin_endpoints.py::test_ban_user ERROR                       [ 30%]
+tests/test_admin_endpoints.py::test_unban_user ERROR                     [ 34%]
+tests/test_admin_endpoints.py::test_reset_points ERROR                   [ 39%]
+tests/test_admin_endpoints.py::test_get_user_stats ERROR                 [ 43%]
+tests/test_auth.py::test_password_hashing PASSED                         [ 47%]
+tests/test_auth.py::test_token_creation PASSED                           [ 52%]
+tests/test_auth.py::test_token_blacklist PASSED                          [ 56%]
+tests/test_group_management.py::test_mute_user FAILED                    [ 60%]
+tests/test_group_management.py::test_unmute_user FAILED                  [ 65%]
+tests/test_group_management.py::test_get_chat_member PASSED              [ 69%]
+tests/test_points.py::test_daily_checkin PASSED                          [ 73%]
+tests/test_points.py::test_activity_points PASSED                        [ 78%]
+tests/test_points.py::test_content_points PASSED                         [ 82%]
+tests/test_verification.py::test_email_format_validation PASSED          [ 86%]
+tests/test_verification.py::test_verification_code PASSED                [ 91%]
+tests/test_verification.py::test_rate_limit PASSED                       [ 95%]
+tests/test_verification.py::test_email_sending PASSED                    [100%]
+
+==================================== ERRORS ====================================
+_______________________ ERROR at setup of test_ban_user ________________________
+file /home/ubuntu/coser_bot/tests/test_admin_endpoints.py, line 51
+  @pytest.mark.asyncio
+  async def test_ban_user(client, admin_token):
+      """测试封禁用户"""
+      response = await client.post(
+          "/admin/users/ban",
+          headers={"Authorization": f"Bearer {admin_token}"},
+          json={
+              "user_id": "123456",
+              "reason": "测试封禁"
+          }
+      )
+      assert response.status_code == 200
+      data = response.json()
+      assert data["success"] is True
+file /home/ubuntu/coser_bot/tests/test_admin_endpoints.py, line 33
+  @pytest_asyncio.fixture(scope="session")
+  async def admin_token(test_db, test_admin):
+      """获取管理员令牌"""
+      # 创建测试管理员
+      admin = AdminUser(
+          username="test_admin",
+          password_hash=Auth.get_password_hash("testpass123"),
+          role=AdminRole.SUPERADMIN,
+          is_active=True
+      )
+      test_db.add(admin)
+      await test_db.commit()
+      await test_db.refresh(admin)
+
+      # 生成令牌
+      token = Auth.create_access_token({"sub": str(admin.id)})
+      return token
+E       fixture 'test_db' not found
+>       available fixtures: _session_event_loop, admin_token, anyio_backend, anyio_backend_name, anyio_backend_options, cache, capfd, capfdbinary, caplog, capsys, capsysbinary, client, doctest_namespace, event_loop, event_loop_policy, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, tests/test_admin_endpoints.py::<event_loop>, tmp_path, tmp_path_factory, tmpdir, tmpdir_factory, unused_tcp_port, unused_tcp_port_factory, unused_udp_port, unused_udp_port_factory
+>       use 'pytest --fixtures [testpath]' for help on them.
+
+/home/ubuntu/coser_bot/tests/test_admin_endpoints.py:33
+______________________ ERROR at setup of test_unban_user _______________________
+file /home/ubuntu/coser_bot/tests/test_admin_endpoints.py, line 66
+  @pytest.mark.asyncio
+  async def test_unban_user(client, admin_token):
+      """测试解封用户"""
+      response = await client.post(
+          "/admin/users/unban",
+          headers={"Authorization": f"Bearer {admin_token}"},
+          json={
+              "user_id": "123456",
+              "reason": "测试解封"
+          }
+      )
+      assert response.status_code == 200
+      data = response.json()
+      assert data["success"] is True
+file /home/ubuntu/coser_bot/tests/test_admin_endpoints.py, line 33
+  @pytest_asyncio.fixture(scope="session")
+  async def admin_token(test_db, test_admin):
+      """获取管理员令牌"""
+      # 创建测试管理员
+      admin = AdminUser(
+          username="test_admin",
+          password_hash=Auth.get_password_hash("testpass123"),
+          role=AdminRole.SUPERADMIN,
+          is_active=True
+      )
+      test_db.add(admin)
+      await test_db.commit()
+      await test_db.refresh(admin)
+
+      # 生成令牌
+      token = Auth.create_access_token({"sub": str(admin.id)})
+      return token
+E       fixture 'test_db' not found
+>       available fixtures: _session_event_loop, admin_token, anyio_backend, anyio_backend_name, anyio_backend_options, cache, capfd, capfdbinary, caplog, capsys, capsysbinary, client, doctest_namespace, event_loop, event_loop_policy, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, tests/test_admin_endpoints.py::<event_loop>, tmp_path, tmp_path_factory, tmpdir, tmpdir_factory, unused_tcp_port, unused_tcp_port_factory, unused_udp_port, unused_udp_port_factory
+>       use 'pytest --fixtures [testpath]' for help on them.
+
+/home/ubuntu/coser_bot/tests/test_admin_endpoints.py:33
+_____________________ ERROR at setup of test_reset_points ______________________
+file /home/ubuntu/coser_bot/tests/test_admin_endpoints.py, line 81
+  @pytest.mark.asyncio
+  async def test_reset_points(client, admin_token):
+      """测试重置积分"""
+      response = await client.post(
+          "/admin/users/reset-points",
+          headers={"Authorization": f"Bearer {admin_token}"},
+          json={
+              "user_id": "123456",
+              "reason": "测试重置积分"
+          }
+      )
+      assert response.status_code == 200
+      data = response.json()
+      assert data["success"] is True
+file /home/ubuntu/coser_bot/tests/test_admin_endpoints.py, line 33
+  @pytest_asyncio.fixture(scope="session")
+  async def admin_token(test_db, test_admin):
+      """获取管理员令牌"""
+      # 创建测试管理员
+      admin = AdminUser(
+          username="test_admin",
+          password_hash=Auth.get_password_hash("testpass123"),
+          role=AdminRole.SUPERADMIN,
+          is_active=True
+      )
+      test_db.add(admin)
+      await test_db.commit()
+      await test_db.refresh(admin)
+
+      # 生成令牌
+      token = Auth.create_access_token({"sub": str(admin.id)})
+      return token
+E       fixture 'test_db' not found
+>       available fixtures: _session_event_loop, admin_token, anyio_backend, anyio_backend_name, anyio_backend_options, cache, capfd, capfdbinary, caplog, capsys, capsysbinary, client, doctest_namespace, event_loop, event_loop_policy, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, tests/test_admin_endpoints.py::<event_loop>, tmp_path, tmp_path_factory, tmpdir, tmpdir_factory, unused_tcp_port, unused_tcp_port_factory, unused_udp_port, unused_udp_port_factory
+>       use 'pytest --fixtures [testpath]' for help on them.
+
+/home/ubuntu/coser_bot/tests/test_admin_endpoints.py:33
+____________________ ERROR at setup of test_get_user_stats _____________________
+file /home/ubuntu/coser_bot/tests/test_admin_endpoints.py, line 96
+  @pytest.mark.asyncio
+  async def test_get_user_stats(client, admin_token):
+      """测试获取用户统计"""
+      response = await client.get(
+          "/admin/stats/users",
+          headers={"Authorization": f"Bearer {admin_token}"}
+      )
+      assert response.status_code == 200
+      data = response.json()
+      assert "total_users" in data
+      assert "active_users" in data
+      assert "banned_users" in data
+file /home/ubuntu/coser_bot/tests/test_admin_endpoints.py, line 33
+  @pytest_asyncio.fixture(scope="session")
+  async def admin_token(test_db, test_admin):
+      """获取管理员令牌"""
+      # 创建测试管理员
+      admin = AdminUser(
+          username="test_admin",
+          password_hash=Auth.get_password_hash("testpass123"),
+          role=AdminRole.SUPERADMIN,
+          is_active=True
+      )
+      test_db.add(admin)
+      await test_db.commit()
+      await test_db.refresh(admin)
+
+      # 生成令牌
+      token = Auth.create_access_token({"sub": str(admin.id)})
+      return token
+E       fixture 'test_db' not found
+>       available fixtures: _session_event_loop, admin_token, anyio_backend, anyio_backend_name, anyio_backend_options, cache, capfd, capfdbinary, caplog, capsys, capsysbinary, client, doctest_namespace, event_loop, event_loop_policy, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, tests/test_admin_endpoints.py::<event_loop>, tmp_path, tmp_path_factory, tmpdir, tmpdir_factory, unused_tcp_port, unused_tcp_port_factory, unused_udp_port, unused_udp_port_factory
+>       use 'pytest --fixtures [testpath]' for help on them.
+
+/home/ubuntu/coser_bot/tests/test_admin_endpoints.py:33
+=================================== FAILURES ===================================
+_____________________________ test_get_admin_info ______________________________
+
+client = <httpx.AsyncClient object at 0x7fe63431f560>
+test_db = <sqlalchemy.ext.asyncio.session.AsyncSession object at 0x7fe63451b230>
+test_admin = <app.models.admin.AdminUser object at 0x7fe63431fad0>
+
+    @pytest.mark.asyncio
+    async def test_get_admin_info(client, test_db, test_admin):
+        """测试获取管理员信息"""
+        print("\n=== 开始测试获取管理员信息 ===")
+        print(f"测试管理员ID: {test_admin.id}")
+        print(f"测试管理员用户名: {test_admin.username}")
+    
+        # 先登录获取token
+        print("\n尝试登录...")
+        login_response = await client.post(
+            "/admin/login",
+            data={
+                "username": "test_admin",
+                "password": "testpass123",
+                "grant_type": "password"  # OAuth2 要求
+            }
+        )
+        print(f"登录响应状态码: {login_response.status_code}")
+        print(f"登录响应内容: {login_response.json()}")
+    
+>       assert login_response.status_code == 200, "登录失败"
+E       AssertionError: 登录失败
+E       assert 401 == 200
+E        +  where 401 = <Response [401 Unauthorized]>.status_code
+
+tests/test_admin_auth.py:148: AssertionError
+----------------------------- Captured stdout call -----------------------------
+
+=== 开始测试获取管理员信息 ===
+测试管理员ID: 1
+测试管理员用户名: test_admin
+
+尝试登录...
+2025-01-22 01:29:58,089 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2025-01-22 01:29:58,089 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("users")
+2025-01-22 01:29:58,089 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-01-22 01:29:58,089 INFO sqlalchemy.engine.Engine PRAGMA temp.table_info("users")
+2025-01-22 01:29:58,089 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-01-22 01:29:58,090 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("point_records")
+2025-01-22 01:29:58,090 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-01-22 01:29:58,091 INFO sqlalchemy.engine.Engine PRAGMA temp.table_info("point_records")
+2025-01-22 01:29:58,091 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-01-22 01:29:58,091 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("admin_users")
+2025-01-22 01:29:58,091 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-01-22 01:29:58,092 INFO sqlalchemy.engine.Engine PRAGMA temp.table_info("admin_users")
+2025-01-22 01:29:58,092 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-01-22 01:29:58,093 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("admin_logs")
+2025-01-22 01:29:58,093 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-01-22 01:29:58,093 INFO sqlalchemy.engine.Engine PRAGMA temp.table_info("admin_logs")
+2025-01-22 01:29:58,093 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-01-22 01:29:58,094 INFO sqlalchemy.engine.Engine 
+CREATE TABLE users (
+	id INTEGER NOT NULL, 
+	telegram_id VARCHAR(32) NOT NULL, 
+	email VARCHAR(128), 
+	status INTEGER, 
+	points INTEGER, 
+	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL, 
+	updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL, 
+	PRIMARY KEY (id), 
+	UNIQUE (telegram_id), 
+	UNIQUE (email)
+)
+
+
+2025-01-22 01:29:58,094 INFO sqlalchemy.engine.Engine [no key 0.00008s] ()
+2025-01-22 01:29:58,095 INFO sqlalchemy.engine.Engine 
+CREATE TABLE point_records (
+	id INTEGER NOT NULL, 
+	user_id INTEGER NOT NULL, 
+	points INTEGER NOT NULL, 
+	type INTEGER NOT NULL, 
+	description VARCHAR(255), 
+	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL, 
+	PRIMARY KEY (id)
+)
+
+
+2025-01-22 01:29:58,095 INFO sqlalchemy.engine.Engine [no key 0.00008s] ()
+2025-01-22 01:29:58,096 INFO sqlalchemy.engine.Engine 
+CREATE TABLE admin_users (
+	id INTEGER NOT NULL, 
+	username VARCHAR(50) NOT NULL, 
+	password_hash VARCHAR(255) NOT NULL, 
+	role VARCHAR(10) NOT NULL, 
+	is_active BOOLEAN, 
+	last_login TIMESTAMP, 
+	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL, 
+	updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL, 
+	PRIMARY KEY (id), 
+	UNIQUE (username)
+)
+
+
+2025-01-22 01:29:58,096 INFO sqlalchemy.engine.Engine [no key 0.00008s] ()
+2025-01-22 01:29:58,097 INFO sqlalchemy.engine.Engine 
+CREATE TABLE admin_logs (
+	id INTEGER NOT NULL, 
+	admin_id INTEGER NOT NULL, 
+	action VARCHAR(50) NOT NULL, 
+	target_type VARCHAR(50) NOT NULL, 
+	target_id VARCHAR(50) NOT NULL, 
+	details VARCHAR(500), 
+	ip_address VARCHAR(50), 
+	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL, 
+	PRIMARY KEY (id), 
+	FOREIGN KEY(admin_id) REFERENCES admin_users (id)
+)
+
+
+2025-01-22 01:29:58,097 INFO sqlalchemy.engine.Engine [no key 0.00008s] ()
+2025-01-22 01:29:58,098 INFO sqlalchemy.engine.Engine COMMIT
+2025-01-22 01:29:58,098 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2025-01-22 01:29:58,098 INFO sqlalchemy.engine.Engine SELECT admin_users.id, admin_users.username, admin_users.password_hash, admin_users.role, admin_users.is_active, admin_users.last_login, admin_users.created_at, admin_users.updated_at 
+FROM admin_users 
+WHERE admin_users.username = ?
+2025-01-22 01:29:58,098 INFO sqlalchemy.engine.Engine [cached since 0.3079s ago] ('test_admin',)
+2025-01-22 01:29:58,099 INFO sqlalchemy.engine.Engine ROLLBACK
+2025-01-22 01:29:58,100 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2025-01-22 01:29:58,100 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("users")
+2025-01-22 01:29:58,100 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-01-22 01:29:58,100 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("point_records")
+2025-01-22 01:29:58,100 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-01-22 01:29:58,101 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("admin_users")
+2025-01-22 01:29:58,101 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-01-22 01:29:58,102 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("admin_logs")
+2025-01-22 01:29:58,102 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-01-22 01:29:58,102 INFO sqlalchemy.engine.Engine 
+DROP TABLE admin_logs
+2025-01-22 01:29:58,102 INFO sqlalchemy.engine.Engine [no key 0.00007s] ()
+2025-01-22 01:29:58,103 INFO sqlalchemy.engine.Engine 
+DROP TABLE admin_users
+2025-01-22 01:29:58,103 INFO sqlalchemy.engine.Engine [no key 0.00011s] ()
+2025-01-22 01:29:58,104 INFO sqlalchemy.engine.Engine 
+DROP TABLE point_records
+2025-01-22 01:29:58,104 INFO sqlalchemy.engine.Engine [no key 0.00007s] ()
+2025-01-22 01:29:58,104 INFO sqlalchemy.engine.Engine 
+DROP TABLE users
+2025-01-22 01:29:58,104 INFO sqlalchemy.engine.Engine [no key 0.00007s] ()
+2025-01-22 01:29:58,105 INFO sqlalchemy.engine.Engine COMMIT
+登录响应状态码: 401
+登录响应内容: {'detail': '用户名或密码错误'}
+------------------------------ Captured log call -------------------------------
+INFO     sqlalchemy.engine.Engine:base.py:2699 BEGIN (implicit)
+INFO     sqlalchemy.engine.Engine:base.py:1843 PRAGMA main.table_info("users")
+INFO     sqlalchemy.engine.Engine:base.py:1843 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 PRAGMA temp.table_info("users")
+INFO     sqlalchemy.engine.Engine:base.py:1843 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 PRAGMA main.table_info("point_records")
+INFO     sqlalchemy.engine.Engine:base.py:1843 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 PRAGMA temp.table_info("point_records")
+INFO     sqlalchemy.engine.Engine:base.py:1843 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 PRAGMA main.table_info("admin_users")
+INFO     sqlalchemy.engine.Engine:base.py:1843 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 PRAGMA temp.table_info("admin_users")
+INFO     sqlalchemy.engine.Engine:base.py:1843 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 PRAGMA main.table_info("admin_logs")
+INFO     sqlalchemy.engine.Engine:base.py:1843 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 PRAGMA temp.table_info("admin_logs")
+INFO     sqlalchemy.engine.Engine:base.py:1843 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 
+CREATE TABLE users (
+	id INTEGER NOT NULL, 
+	telegram_id VARCHAR(32) NOT NULL, 
+	email VARCHAR(128), 
+	status INTEGER, 
+	points INTEGER, 
+	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL, 
+	updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL, 
+	PRIMARY KEY (id), 
+	UNIQUE (telegram_id), 
+	UNIQUE (email)
+)
+
+
+INFO     sqlalchemy.engine.Engine:base.py:1843 [no key 0.00008s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 
+CREATE TABLE point_records (
+	id INTEGER NOT NULL, 
+	user_id INTEGER NOT NULL, 
+	points INTEGER NOT NULL, 
+	type INTEGER NOT NULL, 
+	description VARCHAR(255), 
+	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL, 
+	PRIMARY KEY (id)
+)
+
+
+INFO     sqlalchemy.engine.Engine:base.py:1843 [no key 0.00008s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 
+CREATE TABLE admin_users (
+	id INTEGER NOT NULL, 
+	username VARCHAR(50) NOT NULL, 
+	password_hash VARCHAR(255) NOT NULL, 
+	role VARCHAR(10) NOT NULL, 
+	is_active BOOLEAN, 
+	last_login TIMESTAMP, 
+	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL, 
+	updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL, 
+	PRIMARY KEY (id), 
+	UNIQUE (username)
+)
+
+
+INFO     sqlalchemy.engine.Engine:base.py:1843 [no key 0.00008s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 
+CREATE TABLE admin_logs (
+	id INTEGER NOT NULL, 
+	admin_id INTEGER NOT NULL, 
+	action VARCHAR(50) NOT NULL, 
+	target_type VARCHAR(50) NOT NULL, 
+	target_id VARCHAR(50) NOT NULL, 
+	details VARCHAR(500), 
+	ip_address VARCHAR(50), 
+	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL, 
+	PRIMARY KEY (id), 
+	FOREIGN KEY(admin_id) REFERENCES admin_users (id)
+)
+
+
+INFO     sqlalchemy.engine.Engine:base.py:1843 [no key 0.00008s] ()
+INFO     sqlalchemy.engine.Engine:base.py:2705 COMMIT
+INFO     sqlalchemy.engine.Engine:base.py:2699 BEGIN (implicit)
+INFO     sqlalchemy.engine.Engine:base.py:1843 SELECT admin_users.id, admin_users.username, admin_users.password_hash, admin_users.role, admin_users.is_active, admin_users.last_login, admin_users.created_at, admin_users.updated_at 
+FROM admin_users 
+WHERE admin_users.username = ?
+INFO     sqlalchemy.engine.Engine:base.py:1843 [cached since 0.3079s ago] ('test_admin',)
+INFO     sqlalchemy.engine.Engine:base.py:2702 ROLLBACK
+INFO     sqlalchemy.engine.Engine:base.py:2699 BEGIN (implicit)
+INFO     sqlalchemy.engine.Engine:base.py:1843 PRAGMA main.table_info("users")
+INFO     sqlalchemy.engine.Engine:base.py:1843 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 PRAGMA main.table_info("point_records")
+INFO     sqlalchemy.engine.Engine:base.py:1843 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 PRAGMA main.table_info("admin_users")
+INFO     sqlalchemy.engine.Engine:base.py:1843 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 PRAGMA main.table_info("admin_logs")
+INFO     sqlalchemy.engine.Engine:base.py:1843 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 
+DROP TABLE admin_logs
+INFO     sqlalchemy.engine.Engine:base.py:1843 [no key 0.00007s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 
+DROP TABLE admin_users
+INFO     sqlalchemy.engine.Engine:base.py:1843 [no key 0.00011s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 
+DROP TABLE point_records
+INFO     sqlalchemy.engine.Engine:base.py:1843 [no key 0.00007s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 
+DROP TABLE users
+INFO     sqlalchemy.engine.Engine:base.py:1843 [no key 0.00007s] ()
+INFO     sqlalchemy.engine.Engine:base.py:2705 COMMIT
+_________________________________ test_logout __________________________________
+
+client = <httpx.AsyncClient object at 0x7fe6339ada00>
+test_db = <sqlalchemy.ext.asyncio.session.AsyncSession object at 0x7fe63451b230>
+test_admin = <app.models.admin.AdminUser object at 0x7fe63431fad0>
+
+    @pytest.mark.asyncio
+    async def test_logout(client, test_db, test_admin):
+        """测试注销"""
+        # 先登录获取token
+        login_response = await client.post(
+            "/admin/login",
+            data={
+                "username": "test_admin",
+                "password": "testpass123",
+                "grant_type": "password"  # OAuth2 要求
+            }
+        )
+>       token = login_response.json()["access_token"]
+E       KeyError: 'access_token'
+
+tests/test_admin_auth.py:182: KeyError
+----------------------------- Captured stdout call -----------------------------
+2025-01-22 01:29:58,166 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2025-01-22 01:29:58,166 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("users")
+2025-01-22 01:29:58,166 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-01-22 01:29:58,167 INFO sqlalchemy.engine.Engine PRAGMA temp.table_info("users")
+2025-01-22 01:29:58,167 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-01-22 01:29:58,168 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("point_records")
+2025-01-22 01:29:58,168 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-01-22 01:29:58,168 INFO sqlalchemy.engine.Engine PRAGMA temp.table_info("point_records")
+2025-01-22 01:29:58,168 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-01-22 01:29:58,169 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("admin_users")
+2025-01-22 01:29:58,169 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-01-22 01:29:58,170 INFO sqlalchemy.engine.Engine PRAGMA temp.table_info("admin_users")
+2025-01-22 01:29:58,170 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-01-22 01:29:58,170 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("admin_logs")
+2025-01-22 01:29:58,170 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-01-22 01:29:58,171 INFO sqlalchemy.engine.Engine PRAGMA temp.table_info("admin_logs")
+2025-01-22 01:29:58,171 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-01-22 01:29:58,172 INFO sqlalchemy.engine.Engine 
+CREATE TABLE users (
+	id INTEGER NOT NULL, 
+	telegram_id VARCHAR(32) NOT NULL, 
+	email VARCHAR(128), 
+	status INTEGER, 
+	points INTEGER, 
+	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL, 
+	updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL, 
+	PRIMARY KEY (id), 
+	UNIQUE (telegram_id), 
+	UNIQUE (email)
+)
+
+
+2025-01-22 01:29:58,172 INFO sqlalchemy.engine.Engine [no key 0.00009s] ()
+2025-01-22 01:29:58,173 INFO sqlalchemy.engine.Engine 
+CREATE TABLE point_records (
+	id INTEGER NOT NULL, 
+	user_id INTEGER NOT NULL, 
+	points INTEGER NOT NULL, 
+	type INTEGER NOT NULL, 
+	description VARCHAR(255), 
+	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL, 
+	PRIMARY KEY (id)
+)
+
+
+2025-01-22 01:29:58,173 INFO sqlalchemy.engine.Engine [no key 0.00008s] ()
+2025-01-22 01:29:58,174 INFO sqlalchemy.engine.Engine 
+CREATE TABLE admin_users (
+	id INTEGER NOT NULL, 
+	username VARCHAR(50) NOT NULL, 
+	password_hash VARCHAR(255) NOT NULL, 
+	role VARCHAR(10) NOT NULL, 
+	is_active BOOLEAN, 
+	last_login TIMESTAMP, 
+	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL, 
+	updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL, 
+	PRIMARY KEY (id), 
+	UNIQUE (username)
+)
+
+
+2025-01-22 01:29:58,174 INFO sqlalchemy.engine.Engine [no key 0.00012s] ()
+2025-01-22 01:29:58,174 INFO sqlalchemy.engine.Engine 
+CREATE TABLE admin_logs (
+	id INTEGER NOT NULL, 
+	admin_id INTEGER NOT NULL, 
+	action VARCHAR(50) NOT NULL, 
+	target_type VARCHAR(50) NOT NULL, 
+	target_id VARCHAR(50) NOT NULL, 
+	details VARCHAR(500), 
+	ip_address VARCHAR(50), 
+	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL, 
+	PRIMARY KEY (id), 
+	FOREIGN KEY(admin_id) REFERENCES admin_users (id)
+)
+
+
+2025-01-22 01:29:58,174 INFO sqlalchemy.engine.Engine [no key 0.00007s] ()
+2025-01-22 01:29:58,175 INFO sqlalchemy.engine.Engine COMMIT
+2025-01-22 01:29:58,176 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2025-01-22 01:29:58,176 INFO sqlalchemy.engine.Engine SELECT admin_users.id, admin_users.username, admin_users.password_hash, admin_users.role, admin_users.is_active, admin_users.last_login, admin_users.created_at, admin_users.updated_at 
+FROM admin_users 
+WHERE admin_users.username = ?
+2025-01-22 01:29:58,176 INFO sqlalchemy.engine.Engine [cached since 0.3853s ago] ('test_admin',)
+2025-01-22 01:29:58,177 INFO sqlalchemy.engine.Engine ROLLBACK
+2025-01-22 01:29:58,177 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2025-01-22 01:29:58,177 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("users")
+2025-01-22 01:29:58,177 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-01-22 01:29:58,178 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("point_records")
+2025-01-22 01:29:58,178 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-01-22 01:29:58,178 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("admin_users")
+2025-01-22 01:29:58,179 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-01-22 01:29:58,179 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("admin_logs")
+2025-01-22 01:29:58,179 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-01-22 01:29:58,180 INFO sqlalchemy.engine.Engine 
+DROP TABLE admin_logs
+2025-01-22 01:29:58,180 INFO sqlalchemy.engine.Engine [no key 0.00007s] ()
+2025-01-22 01:29:58,180 INFO sqlalchemy.engine.Engine 
+DROP TABLE admin_users
+2025-01-22 01:29:58,181 INFO sqlalchemy.engine.Engine [no key 0.00007s] ()
+2025-01-22 01:29:58,181 INFO sqlalchemy.engine.Engine 
+DROP TABLE point_records
+2025-01-22 01:29:58,181 INFO sqlalchemy.engine.Engine [no key 0.00008s] ()
+2025-01-22 01:29:58,182 INFO sqlalchemy.engine.Engine 
+DROP TABLE users
+2025-01-22 01:29:58,182 INFO sqlalchemy.engine.Engine [no key 0.00008s] ()
+2025-01-22 01:29:58,182 INFO sqlalchemy.engine.Engine COMMIT
+------------------------------ Captured log call -------------------------------
+INFO     sqlalchemy.engine.Engine:base.py:2699 BEGIN (implicit)
+INFO     sqlalchemy.engine.Engine:base.py:1843 PRAGMA main.table_info("users")
+INFO     sqlalchemy.engine.Engine:base.py:1843 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 PRAGMA temp.table_info("users")
+INFO     sqlalchemy.engine.Engine:base.py:1843 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 PRAGMA main.table_info("point_records")
+INFO     sqlalchemy.engine.Engine:base.py:1843 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 PRAGMA temp.table_info("point_records")
+INFO     sqlalchemy.engine.Engine:base.py:1843 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 PRAGMA main.table_info("admin_users")
+INFO     sqlalchemy.engine.Engine:base.py:1843 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 PRAGMA temp.table_info("admin_users")
+INFO     sqlalchemy.engine.Engine:base.py:1843 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 PRAGMA main.table_info("admin_logs")
+INFO     sqlalchemy.engine.Engine:base.py:1843 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 PRAGMA temp.table_info("admin_logs")
+INFO     sqlalchemy.engine.Engine:base.py:1843 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 
+CREATE TABLE users (
+	id INTEGER NOT NULL, 
+	telegram_id VARCHAR(32) NOT NULL, 
+	email VARCHAR(128), 
+	status INTEGER, 
+	points INTEGER, 
+	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL, 
+	updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL, 
+	PRIMARY KEY (id), 
+	UNIQUE (telegram_id), 
+	UNIQUE (email)
+)
+
+
+INFO     sqlalchemy.engine.Engine:base.py:1843 [no key 0.00009s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 
+CREATE TABLE point_records (
+	id INTEGER NOT NULL, 
+	user_id INTEGER NOT NULL, 
+	points INTEGER NOT NULL, 
+	type INTEGER NOT NULL, 
+	description VARCHAR(255), 
+	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL, 
+	PRIMARY KEY (id)
+)
+
+
+INFO     sqlalchemy.engine.Engine:base.py:1843 [no key 0.00008s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 
+CREATE TABLE admin_users (
+	id INTEGER NOT NULL, 
+	username VARCHAR(50) NOT NULL, 
+	password_hash VARCHAR(255) NOT NULL, 
+	role VARCHAR(10) NOT NULL, 
+	is_active BOOLEAN, 
+	last_login TIMESTAMP, 
+	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL, 
+	updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL, 
+	PRIMARY KEY (id), 
+	UNIQUE (username)
+)
+
+
+INFO     sqlalchemy.engine.Engine:base.py:1843 [no key 0.00012s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 
+CREATE TABLE admin_logs (
+	id INTEGER NOT NULL, 
+	admin_id INTEGER NOT NULL, 
+	action VARCHAR(50) NOT NULL, 
+	target_type VARCHAR(50) NOT NULL, 
+	target_id VARCHAR(50) NOT NULL, 
+	details VARCHAR(500), 
+	ip_address VARCHAR(50), 
+	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL, 
+	PRIMARY KEY (id), 
+	FOREIGN KEY(admin_id) REFERENCES admin_users (id)
+)
+
+
+INFO     sqlalchemy.engine.Engine:base.py:1843 [no key 0.00007s] ()
+INFO     sqlalchemy.engine.Engine:base.py:2705 COMMIT
+INFO     sqlalchemy.engine.Engine:base.py:2699 BEGIN (implicit)
+INFO     sqlalchemy.engine.Engine:base.py:1843 SELECT admin_users.id, admin_users.username, admin_users.password_hash, admin_users.role, admin_users.is_active, admin_users.last_login, admin_users.created_at, admin_users.updated_at 
+FROM admin_users 
+WHERE admin_users.username = ?
+INFO     sqlalchemy.engine.Engine:base.py:1843 [cached since 0.3853s ago] ('test_admin',)
+INFO     sqlalchemy.engine.Engine:base.py:2702 ROLLBACK
+INFO     sqlalchemy.engine.Engine:base.py:2699 BEGIN (implicit)
+INFO     sqlalchemy.engine.Engine:base.py:1843 PRAGMA main.table_info("users")
+INFO     sqlalchemy.engine.Engine:base.py:1843 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 PRAGMA main.table_info("point_records")
+INFO     sqlalchemy.engine.Engine:base.py:1843 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 PRAGMA main.table_info("admin_users")
+INFO     sqlalchemy.engine.Engine:base.py:1843 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 PRAGMA main.table_info("admin_logs")
+INFO     sqlalchemy.engine.Engine:base.py:1843 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 
+DROP TABLE admin_logs
+INFO     sqlalchemy.engine.Engine:base.py:1843 [no key 0.00007s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 
+DROP TABLE admin_users
+INFO     sqlalchemy.engine.Engine:base.py:1843 [no key 0.00007s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 
+DROP TABLE point_records
+INFO     sqlalchemy.engine.Engine:base.py:1843 [no key 0.00008s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 
+DROP TABLE users
+INFO     sqlalchemy.engine.Engine:base.py:1843 [no key 0.00008s] ()
+INFO     sqlalchemy.engine.Engine:base.py:2705 COMMIT
+________________________________ test_mute_user ________________________________
+
+group_service = <app.services.group_management.GroupManagementService object at 0x7fe6339f0350>
+
+    @pytest.mark.asyncio
+    async def test_mute_user(group_service):
+        """测试禁言用户"""
+>       success = await group_service.mute_user(
+            chat_id=123456,
+            user_id=789012,
+            duration=30,
+            reason="测试禁言"
+        )
+
+tests/test_group_management.py:35: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <app.services.group_management.GroupManagementService object at 0x7fe6339f0350>
+chat_id = 123456, user_id = 789012, duration = 30, reason = '测试禁言'
+
+    async def mute_user(
+        self,
+        chat_id: int,
+        user_id: int,
+        duration: Optional[int] = None,
+        reason: str = ""
+    ) -> bool:
+        """
+        禁言用户
+    
+        参数:
+            chat_id: 群组ID
+            user_id: 用户ID
+            duration: 禁言时长（分钟），None表示永久
+            reason: 禁言原因
+        """
+        try:
+            # 设置禁言权限
+>           permissions = ChatPermissions(
+                can_send_messages=False,
+                can_send_media_messages=False,
+                can_send_polls=False,
+                can_send_other_messages=False,
+                can_add_web_page_previews=False,
+                can_invite_users=False
+            )
+E           TypeError: ChatPermissions.__init__() got an unexpected keyword argument 'can_send_media_messages'
+
+app/services/group_management.py:41: TypeError
+_______________________________ test_unmute_user _______________________________
+
+group_service = <app.services.group_management.GroupManagementService object at 0x7fe6339f3320>
+
+    @pytest.mark.asyncio
+    async def test_unmute_user(group_service):
+        """测试解除禁言"""
+>       success = await group_service.unmute_user(
+            chat_id=123456,
+            user_id=789012,
+            reason="测试解除禁言"
+        )
+
+tests/test_group_management.py:47: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <app.services.group_management.GroupManagementService object at 0x7fe6339f3320>
+chat_id = 123456, user_id = 789012, reason = '测试解除禁言'
+
+    async def unmute_user(
+        self,
+        chat_id: int,
+        user_id: int,
+        reason: str = ""
+    ) -> bool:
+        """
+        解除用户禁言
+    
+        参数:
+            chat_id: 群组ID
+            user_id: 用户ID
+            reason: 解除原因
+        """
+        try:
+            # 恢复默认权限
+>           permissions = ChatPermissions(
+                can_send_messages=True,
+                can_send_media_messages=True,
+                can_send_polls=True,
+                can_send_other_messages=True,
+                can_add_web_page_previews=True,
+                can_invite_users=True
+            )
+E           TypeError: ChatPermissions.__init__() got an unexpected keyword argument 'can_send_media_messages'
+
+app/services/group_management.py:97: TypeError
+=============================== warnings summary ===============================
+venv/lib/python3.12/site-packages/pydantic/_internal/_config.py:295
+venv/lib/python3.12/site-packages/pydantic/_internal/_config.py:295
+  /home/ubuntu/coser_bot/venv/lib/python3.12/site-packages/pydantic/_internal/_config.py:295: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.10/migration/
+    warnings.warn(DEPRECATION_MESSAGE, DeprecationWarning)
+
+app/db/database.py:35
+  /home/ubuntu/coser_bot/app/db/database.py:35: MovedIn20Warning: The ``declarative_base()`` function is now available as sqlalchemy.orm.declarative_base(). (deprecated since: 2.0) (Background on SQLAlchemy 2.0 at: https://sqlalche.me/e/b8d9)
+    Base = declarative_base()
+
+venv/lib/python3.12/site-packages/passlib/utils/__init__.py:854
+  /home/ubuntu/coser_bot/venv/lib/python3.12/site-packages/passlib/utils/__init__.py:854: DeprecationWarning: 'crypt' is deprecated and slated for removal in Python 3.13
+    from crypt import crypt as _crypt
+
+tests/test_admin_auth.py::test_login
+tests/test_auth.py::test_token_creation
+  /home/ubuntu/coser_bot/app/core/auth.py:48: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    expire = datetime.utcnow() + expires_delta
+
+tests/test_admin_auth.py::test_login
+  /home/ubuntu/coser_bot/app/routers/admin.py:58: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    admin.last_login = datetime.utcnow()
+
+tests/test_auth.py::test_token_blacklist
+  /home/ubuntu/coser_bot/app/core/auth.py:50: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    expire = datetime.utcnow() + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+
+tests/test_auth.py::test_token_blacklist
+  /home/ubuntu/coser_bot/venv/lib/python3.12/site-packages/jose/jwt.py:311: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    now = timegm(datetime.utcnow().utctimetuple())
+
+tests/test_auth.py::test_token_blacklist
+  /home/ubuntu/coser_bot/app/core/auth.py:143: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    ttl = exp - datetime.utcnow().timestamp()
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_admin_auth.py::test_get_admin_info - AssertionError: 登录失败
+FAILED tests/test_admin_auth.py::test_logout - KeyError: 'access_token'
+FAILED tests/test_group_management.py::test_mute_user - TypeError: ChatPermissions.__init__() got an unexpected keyword argument 'c...
+FAILED tests/test_group_management.py::test_unmute_user - TypeError: ChatPermissions.__init__() got an unexpected keyword argument 'c...
+ERROR tests/test_admin_endpoints.py::test_ban_user
+ERROR tests/test_admin_endpoints.py::test_unban_user
+ERROR tests/test_admin_endpoints.py::test_reset_points
+ERROR tests/test_admin_endpoints.py::test_get_user_stats
+============= 4 failed, 15 passed, 10 warnings, 4 errors in 6.50s ==============

@@ -1,0 +1,1234 @@
+/home/ubuntu/coser_bot/venv/lib/python3.12/site-packages/pytest_asyncio/plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+============================= test session starts ==============================
+platform linux -- Python 3.12.8, pytest-8.3.4, pluggy-1.5.0 -- /home/ubuntu/coser_bot/venv/bin/python
+cachedir: .pytest_cache
+rootdir: /home/ubuntu/coser_bot
+configfile: pyproject.toml
+plugins: anyio-4.8.0, asyncio-0.25.2
+asyncio: mode=Mode.STRICT, asyncio_default_fixture_loop_scope=None
+collected 7 items                                                              
+
+tests/test_admin_auth.py::test_login PASSED                              [ 14%]
+tests/test_admin_auth.py::test_login_invalid_credentials PASSED          [ 28%]
+tests/test_admin_auth.py::test_get_admin_info FAILED                     [ 42%]
+tests/test_admin_auth.py::test_logout PASSED                             [ 57%]
+tests/test_group_management.py::test_mute_user FAILED                    [ 71%]
+tests/test_group_management.py::test_unmute_user FAILED                  [ 85%]
+tests/test_group_management.py::test_get_chat_member FAILED              [100%]
+
+=================================== FAILURES ===================================
+_____________________________ test_get_admin_info ______________________________
+
+client = <httpx.AsyncClient object at 0x7f8108c62990>
+test_db = <sqlalchemy.ext.asyncio.session.AsyncSession object at 0x7f8108fa2870>
+test_admin = <app.models.admin.AdminUser object at 0x7f8108c60560>
+
+    @pytest.mark.asyncio
+    async def test_get_admin_info(client, test_db, test_admin):
+        """测试获取管理员信息"""
+        # 先登录获取token
+        login_response = await client.post(
+            "/admin/login",
+            data={
+                "username": "test_admin",
+                "password": "testpass123",
+                "grant_type": "password"  # OAuth2 要求
+            }
+        )
+        token = login_response.json()["access_token"]
+    
+        # 使用token获取管理员信息
+        response = await client.get(
+            "/admin/me",
+            headers={"Authorization": f"Bearer {token}"}
+        )
+>       assert response.status_code == 200
+E       assert 401 == 200
+E        +  where 401 = <Response [401 Unauthorized]>.status_code
+
+tests/test_admin_auth.py:139: AssertionError
+---------------------------- Captured stdout setup -----------------------------
+2025-01-21 21:10:52,487 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2025-01-21 21:10:52,488 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("users")
+2025-01-21 21:10:52,488 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-01-21 21:10:52,488 INFO sqlalchemy.engine.Engine PRAGMA temp.table_info("users")
+2025-01-21 21:10:52,488 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-01-21 21:10:52,489 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("point_records")
+2025-01-21 21:10:52,489 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-01-21 21:10:52,490 INFO sqlalchemy.engine.Engine PRAGMA temp.table_info("point_records")
+2025-01-21 21:10:52,490 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-01-21 21:10:52,490 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("admin_users")
+2025-01-21 21:10:52,490 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-01-21 21:10:52,491 INFO sqlalchemy.engine.Engine PRAGMA temp.table_info("admin_users")
+2025-01-21 21:10:52,491 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-01-21 21:10:52,491 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("admin_logs")
+2025-01-21 21:10:52,492 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-01-21 21:10:52,492 INFO sqlalchemy.engine.Engine PRAGMA temp.table_info("admin_logs")
+2025-01-21 21:10:52,492 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-01-21 21:10:52,493 INFO sqlalchemy.engine.Engine 
+CREATE TABLE users (
+	id INTEGER NOT NULL, 
+	telegram_id VARCHAR(32) NOT NULL, 
+	email VARCHAR(128), 
+	status INTEGER, 
+	points INTEGER, 
+	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL, 
+	updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL, 
+	PRIMARY KEY (id), 
+	UNIQUE (telegram_id), 
+	UNIQUE (email)
+)
+
+
+2025-01-21 21:10:52,493 INFO sqlalchemy.engine.Engine [no key 0.00009s] ()
+2025-01-21 21:10:52,494 INFO sqlalchemy.engine.Engine 
+CREATE TABLE point_records (
+	id INTEGER NOT NULL, 
+	user_id INTEGER NOT NULL, 
+	points INTEGER NOT NULL, 
+	type INTEGER NOT NULL, 
+	description VARCHAR(255), 
+	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL, 
+	PRIMARY KEY (id)
+)
+
+
+2025-01-21 21:10:52,494 INFO sqlalchemy.engine.Engine [no key 0.00007s] ()
+2025-01-21 21:10:52,494 INFO sqlalchemy.engine.Engine 
+CREATE TABLE admin_users (
+	id INTEGER NOT NULL, 
+	username VARCHAR(50) NOT NULL, 
+	password_hash VARCHAR(255) NOT NULL, 
+	role VARCHAR(10) NOT NULL, 
+	is_active BOOLEAN, 
+	last_login TIMESTAMP, 
+	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL, 
+	updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL, 
+	PRIMARY KEY (id), 
+	UNIQUE (username)
+)
+
+
+2025-01-21 21:10:52,495 INFO sqlalchemy.engine.Engine [no key 0.00008s] ()
+2025-01-21 21:10:52,495 INFO sqlalchemy.engine.Engine 
+CREATE TABLE admin_logs (
+	id INTEGER NOT NULL, 
+	admin_id INTEGER NOT NULL, 
+	action VARCHAR(50) NOT NULL, 
+	target_type VARCHAR(50) NOT NULL, 
+	target_id VARCHAR(50) NOT NULL, 
+	details VARCHAR(500), 
+	ip_address VARCHAR(50), 
+	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL, 
+	PRIMARY KEY (id), 
+	FOREIGN KEY(admin_id) REFERENCES admin_users (id)
+)
+
+
+2025-01-21 21:10:52,495 INFO sqlalchemy.engine.Engine [no key 0.00008s] ()
+2025-01-21 21:10:52,496 INFO sqlalchemy.engine.Engine COMMIT
+2025-01-21 21:10:52,747 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2025-01-21 21:10:52,747 INFO sqlalchemy.engine.Engine INSERT INTO admin_users (username, password_hash, role, is_active, last_login) VALUES (?, ?, ?, ?, ?) RETURNING id, created_at, updated_at
+2025-01-21 21:10:52,747 INFO sqlalchemy.engine.Engine [cached since 1.104s ago] ('test_admin', '$2b$12$Gmvlf.T1YL/T7S0bn.lBGu6/AhZCBTXTI8H68QzE/SO/Syrt25Mm.', 'SUPERADMIN', 1, None)
+2025-01-21 21:10:52,748 INFO sqlalchemy.engine.Engine COMMIT
+2025-01-21 21:10:52,749 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2025-01-21 21:10:52,749 INFO sqlalchemy.engine.Engine SELECT admin_users.id, admin_users.username, admin_users.password_hash, admin_users.role, admin_users.is_active, admin_users.last_login, admin_users.created_at, admin_users.updated_at 
+FROM admin_users 
+WHERE admin_users.id = ?
+2025-01-21 21:10:52,749 INFO sqlalchemy.engine.Engine [cached since 1.102s ago] (1,)
+------------------------------ Captured log setup ------------------------------
+INFO     sqlalchemy.engine.Engine:base.py:2699 BEGIN (implicit)
+INFO     sqlalchemy.engine.Engine:base.py:1843 PRAGMA main.table_info("users")
+INFO     sqlalchemy.engine.Engine:base.py:1843 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 PRAGMA temp.table_info("users")
+INFO     sqlalchemy.engine.Engine:base.py:1843 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 PRAGMA main.table_info("point_records")
+INFO     sqlalchemy.engine.Engine:base.py:1843 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 PRAGMA temp.table_info("point_records")
+INFO     sqlalchemy.engine.Engine:base.py:1843 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 PRAGMA main.table_info("admin_users")
+INFO     sqlalchemy.engine.Engine:base.py:1843 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 PRAGMA temp.table_info("admin_users")
+INFO     sqlalchemy.engine.Engine:base.py:1843 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 PRAGMA main.table_info("admin_logs")
+INFO     sqlalchemy.engine.Engine:base.py:1843 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 PRAGMA temp.table_info("admin_logs")
+INFO     sqlalchemy.engine.Engine:base.py:1843 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 
+CREATE TABLE users (
+	id INTEGER NOT NULL, 
+	telegram_id VARCHAR(32) NOT NULL, 
+	email VARCHAR(128), 
+	status INTEGER, 
+	points INTEGER, 
+	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL, 
+	updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL, 
+	PRIMARY KEY (id), 
+	UNIQUE (telegram_id), 
+	UNIQUE (email)
+)
+
+
+INFO     sqlalchemy.engine.Engine:base.py:1843 [no key 0.00009s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 
+CREATE TABLE point_records (
+	id INTEGER NOT NULL, 
+	user_id INTEGER NOT NULL, 
+	points INTEGER NOT NULL, 
+	type INTEGER NOT NULL, 
+	description VARCHAR(255), 
+	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL, 
+	PRIMARY KEY (id)
+)
+
+
+INFO     sqlalchemy.engine.Engine:base.py:1843 [no key 0.00007s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 
+CREATE TABLE admin_users (
+	id INTEGER NOT NULL, 
+	username VARCHAR(50) NOT NULL, 
+	password_hash VARCHAR(255) NOT NULL, 
+	role VARCHAR(10) NOT NULL, 
+	is_active BOOLEAN, 
+	last_login TIMESTAMP, 
+	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL, 
+	updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL, 
+	PRIMARY KEY (id), 
+	UNIQUE (username)
+)
+
+
+INFO     sqlalchemy.engine.Engine:base.py:1843 [no key 0.00008s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 
+CREATE TABLE admin_logs (
+	id INTEGER NOT NULL, 
+	admin_id INTEGER NOT NULL, 
+	action VARCHAR(50) NOT NULL, 
+	target_type VARCHAR(50) NOT NULL, 
+	target_id VARCHAR(50) NOT NULL, 
+	details VARCHAR(500), 
+	ip_address VARCHAR(50), 
+	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL, 
+	PRIMARY KEY (id), 
+	FOREIGN KEY(admin_id) REFERENCES admin_users (id)
+)
+
+
+INFO     sqlalchemy.engine.Engine:base.py:1843 [no key 0.00008s] ()
+INFO     sqlalchemy.engine.Engine:base.py:2705 COMMIT
+INFO     sqlalchemy.engine.Engine:base.py:2699 BEGIN (implicit)
+INFO     sqlalchemy.engine.Engine:base.py:1843 INSERT INTO admin_users (username, password_hash, role, is_active, last_login) VALUES (?, ?, ?, ?, ?) RETURNING id, created_at, updated_at
+INFO     sqlalchemy.engine.Engine:base.py:1843 [cached since 1.104s ago] ('test_admin', '$2b$12$Gmvlf.T1YL/T7S0bn.lBGu6/AhZCBTXTI8H68QzE/SO/Syrt25Mm.', 'SUPERADMIN', 1, None)
+INFO     sqlalchemy.engine.Engine:base.py:2705 COMMIT
+INFO     sqlalchemy.engine.Engine:base.py:2699 BEGIN (implicit)
+INFO     sqlalchemy.engine.Engine:base.py:1843 SELECT admin_users.id, admin_users.username, admin_users.password_hash, admin_users.role, admin_users.is_active, admin_users.last_login, admin_users.created_at, admin_users.updated_at 
+FROM admin_users 
+WHERE admin_users.id = ?
+INFO     sqlalchemy.engine.Engine:base.py:1843 [cached since 1.102s ago] (1,)
+----------------------------- Captured stdout call -----------------------------
+2025-01-21 21:10:52,753 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2025-01-21 21:10:52,753 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("users")
+2025-01-21 21:10:52,753 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-01-21 21:10:52,754 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("point_records")
+2025-01-21 21:10:52,754 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-01-21 21:10:52,755 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("admin_users")
+2025-01-21 21:10:52,755 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-01-21 21:10:52,756 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("admin_logs")
+2025-01-21 21:10:52,756 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-01-21 21:10:52,756 INFO sqlalchemy.engine.Engine COMMIT
+2025-01-21 21:10:52,757 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2025-01-21 21:10:52,757 INFO sqlalchemy.engine.Engine SELECT admin_users.id, admin_users.username, admin_users.password_hash, admin_users.role, admin_users.is_active, admin_users.last_login, admin_users.created_at, admin_users.updated_at 
+FROM admin_users 
+WHERE admin_users.username = ?
+2025-01-21 21:10:52,757 INFO sqlalchemy.engine.Engine [cached since 1.092s ago] ('test_admin',)
+2025-01-21 21:10:53,008 INFO sqlalchemy.engine.Engine UPDATE admin_users SET last_login=? WHERE admin_users.id = ?
+2025-01-21 21:10:53,008 INFO sqlalchemy.engine.Engine [cached since 1.083s ago] ('2025-01-21 21:10:53.008430', 1)
+2025-01-21 21:10:53,009 INFO sqlalchemy.engine.Engine COMMIT
+2025-01-21 21:10:53,010 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2025-01-21 21:10:53,010 INFO sqlalchemy.engine.Engine INSERT INTO admin_logs (admin_id, action, target_type, target_id, details, ip_address) VALUES (?, ?, ?, ?, ?, ?) RETURNING id, created_at
+2025-01-21 21:10:53,010 INFO sqlalchemy.engine.Engine [cached since 1.081s ago] (1, 'login', 'admin', '1', '管理员登录成功', None)
+2025-01-21 21:10:53,011 INFO sqlalchemy.engine.Engine COMMIT
+2025-01-21 21:10:53,011 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2025-01-21 21:10:53,011 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("users")
+2025-01-21 21:10:53,012 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-01-21 21:10:53,012 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("point_records")
+2025-01-21 21:10:53,012 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-01-21 21:10:53,013 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("admin_users")
+2025-01-21 21:10:53,013 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-01-21 21:10:53,014 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("admin_logs")
+2025-01-21 21:10:53,014 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-01-21 21:10:53,014 INFO sqlalchemy.engine.Engine 
+DROP TABLE admin_logs
+2025-01-21 21:10:53,015 INFO sqlalchemy.engine.Engine [no key 0.00011s] ()
+2025-01-21 21:10:53,015 INFO sqlalchemy.engine.Engine 
+DROP TABLE admin_users
+2025-01-21 21:10:53,015 INFO sqlalchemy.engine.Engine [no key 0.00008s] ()
+2025-01-21 21:10:53,016 INFO sqlalchemy.engine.Engine 
+DROP TABLE point_records
+2025-01-21 21:10:53,016 INFO sqlalchemy.engine.Engine [no key 0.00013s] ()
+2025-01-21 21:10:53,017 INFO sqlalchemy.engine.Engine 
+DROP TABLE users
+2025-01-21 21:10:53,017 INFO sqlalchemy.engine.Engine [no key 0.00008s] ()
+2025-01-21 21:10:53,017 INFO sqlalchemy.engine.Engine COMMIT
+2025-01-21 21:10:53,019 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2025-01-21 21:10:53,019 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("users")
+2025-01-21 21:10:53,019 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-01-21 21:10:53,019 INFO sqlalchemy.engine.Engine PRAGMA temp.table_info("users")
+2025-01-21 21:10:53,019 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-01-21 21:10:53,020 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("point_records")
+2025-01-21 21:10:53,020 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-01-21 21:10:53,021 INFO sqlalchemy.engine.Engine PRAGMA temp.table_info("point_records")
+2025-01-21 21:10:53,021 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-01-21 21:10:53,021 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("admin_users")
+2025-01-21 21:10:53,021 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-01-21 21:10:53,022 INFO sqlalchemy.engine.Engine PRAGMA temp.table_info("admin_users")
+2025-01-21 21:10:53,022 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-01-21 21:10:53,023 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("admin_logs")
+2025-01-21 21:10:53,023 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-01-21 21:10:53,023 INFO sqlalchemy.engine.Engine PRAGMA temp.table_info("admin_logs")
+2025-01-21 21:10:53,023 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-01-21 21:10:53,024 INFO sqlalchemy.engine.Engine 
+CREATE TABLE users (
+	id INTEGER NOT NULL, 
+	telegram_id VARCHAR(32) NOT NULL, 
+	email VARCHAR(128), 
+	status INTEGER, 
+	points INTEGER, 
+	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL, 
+	updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL, 
+	PRIMARY KEY (id), 
+	UNIQUE (telegram_id), 
+	UNIQUE (email)
+)
+
+
+2025-01-21 21:10:53,024 INFO sqlalchemy.engine.Engine [no key 0.00010s] ()
+2025-01-21 21:10:53,025 INFO sqlalchemy.engine.Engine 
+CREATE TABLE point_records (
+	id INTEGER NOT NULL, 
+	user_id INTEGER NOT NULL, 
+	points INTEGER NOT NULL, 
+	type INTEGER NOT NULL, 
+	description VARCHAR(255), 
+	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL, 
+	PRIMARY KEY (id)
+)
+
+
+2025-01-21 21:10:53,025 INFO sqlalchemy.engine.Engine [no key 0.00008s] ()
+2025-01-21 21:10:53,026 INFO sqlalchemy.engine.Engine 
+CREATE TABLE admin_users (
+	id INTEGER NOT NULL, 
+	username VARCHAR(50) NOT NULL, 
+	password_hash VARCHAR(255) NOT NULL, 
+	role VARCHAR(10) NOT NULL, 
+	is_active BOOLEAN, 
+	last_login TIMESTAMP, 
+	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL, 
+	updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL, 
+	PRIMARY KEY (id), 
+	UNIQUE (username)
+)
+
+
+2025-01-21 21:10:53,026 INFO sqlalchemy.engine.Engine [no key 0.00008s] ()
+2025-01-21 21:10:53,027 INFO sqlalchemy.engine.Engine 
+CREATE TABLE admin_logs (
+	id INTEGER NOT NULL, 
+	admin_id INTEGER NOT NULL, 
+	action VARCHAR(50) NOT NULL, 
+	target_type VARCHAR(50) NOT NULL, 
+	target_id VARCHAR(50) NOT NULL, 
+	details VARCHAR(500), 
+	ip_address VARCHAR(50), 
+	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL, 
+	PRIMARY KEY (id), 
+	FOREIGN KEY(admin_id) REFERENCES admin_users (id)
+)
+
+
+2025-01-21 21:10:53,027 INFO sqlalchemy.engine.Engine [no key 0.00008s] ()
+2025-01-21 21:10:53,027 INFO sqlalchemy.engine.Engine COMMIT
+2025-01-21 21:10:53,029 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2025-01-21 21:10:53,029 INFO sqlalchemy.engine.Engine SELECT admin_users.id, admin_users.username, admin_users.password_hash, admin_users.role, admin_users.is_active, admin_users.last_login, admin_users.created_at, admin_users.updated_at 
+FROM admin_users 
+WHERE admin_users.id = ?
+2025-01-21 21:10:53,029 INFO sqlalchemy.engine.Engine [generated in 0.00012s] ('1',)
+2025-01-21 21:10:53,030 INFO sqlalchemy.engine.Engine ROLLBACK
+2025-01-21 21:10:53,031 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2025-01-21 21:10:53,031 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("users")
+2025-01-21 21:10:53,031 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-01-21 21:10:53,031 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("point_records")
+2025-01-21 21:10:53,031 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-01-21 21:10:53,032 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("admin_users")
+2025-01-21 21:10:53,032 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-01-21 21:10:53,033 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("admin_logs")
+2025-01-21 21:10:53,033 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-01-21 21:10:53,034 INFO sqlalchemy.engine.Engine 
+DROP TABLE admin_logs
+2025-01-21 21:10:53,034 INFO sqlalchemy.engine.Engine [no key 0.00007s] ()
+2025-01-21 21:10:53,034 INFO sqlalchemy.engine.Engine 
+DROP TABLE admin_users
+2025-01-21 21:10:53,034 INFO sqlalchemy.engine.Engine [no key 0.00008s] ()
+2025-01-21 21:10:53,035 INFO sqlalchemy.engine.Engine 
+DROP TABLE point_records
+2025-01-21 21:10:53,035 INFO sqlalchemy.engine.Engine [no key 0.00008s] ()
+2025-01-21 21:10:53,035 INFO sqlalchemy.engine.Engine 
+DROP TABLE users
+2025-01-21 21:10:53,036 INFO sqlalchemy.engine.Engine [no key 0.00011s] ()
+2025-01-21 21:10:53,036 INFO sqlalchemy.engine.Engine COMMIT
+------------------------------ Captured log call -------------------------------
+INFO     sqlalchemy.engine.Engine:base.py:2699 BEGIN (implicit)
+INFO     sqlalchemy.engine.Engine:base.py:1843 PRAGMA main.table_info("users")
+INFO     sqlalchemy.engine.Engine:base.py:1843 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 PRAGMA main.table_info("point_records")
+INFO     sqlalchemy.engine.Engine:base.py:1843 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 PRAGMA main.table_info("admin_users")
+INFO     sqlalchemy.engine.Engine:base.py:1843 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 PRAGMA main.table_info("admin_logs")
+INFO     sqlalchemy.engine.Engine:base.py:1843 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:2705 COMMIT
+INFO     sqlalchemy.engine.Engine:base.py:2699 BEGIN (implicit)
+INFO     sqlalchemy.engine.Engine:base.py:1843 SELECT admin_users.id, admin_users.username, admin_users.password_hash, admin_users.role, admin_users.is_active, admin_users.last_login, admin_users.created_at, admin_users.updated_at 
+FROM admin_users 
+WHERE admin_users.username = ?
+INFO     sqlalchemy.engine.Engine:base.py:1843 [cached since 1.092s ago] ('test_admin',)
+INFO     sqlalchemy.engine.Engine:base.py:1843 UPDATE admin_users SET last_login=? WHERE admin_users.id = ?
+INFO     sqlalchemy.engine.Engine:base.py:1843 [cached since 1.083s ago] ('2025-01-21 21:10:53.008430', 1)
+INFO     sqlalchemy.engine.Engine:base.py:2705 COMMIT
+INFO     sqlalchemy.engine.Engine:base.py:2699 BEGIN (implicit)
+INFO     sqlalchemy.engine.Engine:base.py:1843 INSERT INTO admin_logs (admin_id, action, target_type, target_id, details, ip_address) VALUES (?, ?, ?, ?, ?, ?) RETURNING id, created_at
+INFO     sqlalchemy.engine.Engine:base.py:1843 [cached since 1.081s ago] (1, 'login', 'admin', '1', '管理员登录成功', None)
+INFO     sqlalchemy.engine.Engine:base.py:2705 COMMIT
+INFO     sqlalchemy.engine.Engine:base.py:2699 BEGIN (implicit)
+INFO     sqlalchemy.engine.Engine:base.py:1843 PRAGMA main.table_info("users")
+INFO     sqlalchemy.engine.Engine:base.py:1843 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 PRAGMA main.table_info("point_records")
+INFO     sqlalchemy.engine.Engine:base.py:1843 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 PRAGMA main.table_info("admin_users")
+INFO     sqlalchemy.engine.Engine:base.py:1843 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 PRAGMA main.table_info("admin_logs")
+INFO     sqlalchemy.engine.Engine:base.py:1843 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 
+DROP TABLE admin_logs
+INFO     sqlalchemy.engine.Engine:base.py:1843 [no key 0.00011s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 
+DROP TABLE admin_users
+INFO     sqlalchemy.engine.Engine:base.py:1843 [no key 0.00008s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 
+DROP TABLE point_records
+INFO     sqlalchemy.engine.Engine:base.py:1843 [no key 0.00013s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 
+DROP TABLE users
+INFO     sqlalchemy.engine.Engine:base.py:1843 [no key 0.00008s] ()
+INFO     sqlalchemy.engine.Engine:base.py:2705 COMMIT
+INFO     sqlalchemy.engine.Engine:base.py:2699 BEGIN (implicit)
+INFO     sqlalchemy.engine.Engine:base.py:1843 PRAGMA main.table_info("users")
+INFO     sqlalchemy.engine.Engine:base.py:1843 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 PRAGMA temp.table_info("users")
+INFO     sqlalchemy.engine.Engine:base.py:1843 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 PRAGMA main.table_info("point_records")
+INFO     sqlalchemy.engine.Engine:base.py:1843 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 PRAGMA temp.table_info("point_records")
+INFO     sqlalchemy.engine.Engine:base.py:1843 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 PRAGMA main.table_info("admin_users")
+INFO     sqlalchemy.engine.Engine:base.py:1843 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 PRAGMA temp.table_info("admin_users")
+INFO     sqlalchemy.engine.Engine:base.py:1843 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 PRAGMA main.table_info("admin_logs")
+INFO     sqlalchemy.engine.Engine:base.py:1843 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 PRAGMA temp.table_info("admin_logs")
+INFO     sqlalchemy.engine.Engine:base.py:1843 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 
+CREATE TABLE users (
+	id INTEGER NOT NULL, 
+	telegram_id VARCHAR(32) NOT NULL, 
+	email VARCHAR(128), 
+	status INTEGER, 
+	points INTEGER, 
+	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL, 
+	updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL, 
+	PRIMARY KEY (id), 
+	UNIQUE (telegram_id), 
+	UNIQUE (email)
+)
+
+
+INFO     sqlalchemy.engine.Engine:base.py:1843 [no key 0.00010s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 
+CREATE TABLE point_records (
+	id INTEGER NOT NULL, 
+	user_id INTEGER NOT NULL, 
+	points INTEGER NOT NULL, 
+	type INTEGER NOT NULL, 
+	description VARCHAR(255), 
+	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL, 
+	PRIMARY KEY (id)
+)
+
+
+INFO     sqlalchemy.engine.Engine:base.py:1843 [no key 0.00008s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 
+CREATE TABLE admin_users (
+	id INTEGER NOT NULL, 
+	username VARCHAR(50) NOT NULL, 
+	password_hash VARCHAR(255) NOT NULL, 
+	role VARCHAR(10) NOT NULL, 
+	is_active BOOLEAN, 
+	last_login TIMESTAMP, 
+	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL, 
+	updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL, 
+	PRIMARY KEY (id), 
+	UNIQUE (username)
+)
+
+
+INFO     sqlalchemy.engine.Engine:base.py:1843 [no key 0.00008s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 
+CREATE TABLE admin_logs (
+	id INTEGER NOT NULL, 
+	admin_id INTEGER NOT NULL, 
+	action VARCHAR(50) NOT NULL, 
+	target_type VARCHAR(50) NOT NULL, 
+	target_id VARCHAR(50) NOT NULL, 
+	details VARCHAR(500), 
+	ip_address VARCHAR(50), 
+	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL, 
+	PRIMARY KEY (id), 
+	FOREIGN KEY(admin_id) REFERENCES admin_users (id)
+)
+
+
+INFO     sqlalchemy.engine.Engine:base.py:1843 [no key 0.00008s] ()
+INFO     sqlalchemy.engine.Engine:base.py:2705 COMMIT
+INFO     sqlalchemy.engine.Engine:base.py:2699 BEGIN (implicit)
+INFO     sqlalchemy.engine.Engine:base.py:1843 SELECT admin_users.id, admin_users.username, admin_users.password_hash, admin_users.role, admin_users.is_active, admin_users.last_login, admin_users.created_at, admin_users.updated_at 
+FROM admin_users 
+WHERE admin_users.id = ?
+INFO     sqlalchemy.engine.Engine:base.py:1843 [generated in 0.00012s] ('1',)
+INFO     sqlalchemy.engine.Engine:base.py:2702 ROLLBACK
+INFO     sqlalchemy.engine.Engine:base.py:2699 BEGIN (implicit)
+INFO     sqlalchemy.engine.Engine:base.py:1843 PRAGMA main.table_info("users")
+INFO     sqlalchemy.engine.Engine:base.py:1843 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 PRAGMA main.table_info("point_records")
+INFO     sqlalchemy.engine.Engine:base.py:1843 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 PRAGMA main.table_info("admin_users")
+INFO     sqlalchemy.engine.Engine:base.py:1843 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 PRAGMA main.table_info("admin_logs")
+INFO     sqlalchemy.engine.Engine:base.py:1843 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 
+DROP TABLE admin_logs
+INFO     sqlalchemy.engine.Engine:base.py:1843 [no key 0.00007s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 
+DROP TABLE admin_users
+INFO     sqlalchemy.engine.Engine:base.py:1843 [no key 0.00008s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 
+DROP TABLE point_records
+INFO     sqlalchemy.engine.Engine:base.py:1843 [no key 0.00008s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 
+DROP TABLE users
+INFO     sqlalchemy.engine.Engine:base.py:1843 [no key 0.00011s] ()
+INFO     sqlalchemy.engine.Engine:base.py:2705 COMMIT
+--------------------------- Captured stdout teardown ---------------------------
+2025-01-21 21:10:53,091 INFO sqlalchemy.engine.Engine COMMIT
+2025-01-21 21:10:53,092 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2025-01-21 21:10:53,092 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("users")
+2025-01-21 21:10:53,092 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-01-21 21:10:53,093 INFO sqlalchemy.engine.Engine PRAGMA temp.table_info("users")
+2025-01-21 21:10:53,093 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-01-21 21:10:53,093 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("point_records")
+2025-01-21 21:10:53,093 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-01-21 21:10:53,094 INFO sqlalchemy.engine.Engine PRAGMA temp.table_info("point_records")
+2025-01-21 21:10:53,094 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-01-21 21:10:53,095 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("admin_users")
+2025-01-21 21:10:53,095 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-01-21 21:10:53,095 INFO sqlalchemy.engine.Engine PRAGMA temp.table_info("admin_users")
+2025-01-21 21:10:53,095 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-01-21 21:10:53,096 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("admin_logs")
+2025-01-21 21:10:53,096 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-01-21 21:10:53,097 INFO sqlalchemy.engine.Engine PRAGMA temp.table_info("admin_logs")
+2025-01-21 21:10:53,097 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-01-21 21:10:53,097 INFO sqlalchemy.engine.Engine COMMIT
+---------------------------- Captured log teardown -----------------------------
+INFO     sqlalchemy.engine.Engine:base.py:2705 COMMIT
+INFO     sqlalchemy.engine.Engine:base.py:2699 BEGIN (implicit)
+INFO     sqlalchemy.engine.Engine:base.py:1843 PRAGMA main.table_info("users")
+INFO     sqlalchemy.engine.Engine:base.py:1843 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 PRAGMA temp.table_info("users")
+INFO     sqlalchemy.engine.Engine:base.py:1843 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 PRAGMA main.table_info("point_records")
+INFO     sqlalchemy.engine.Engine:base.py:1843 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 PRAGMA temp.table_info("point_records")
+INFO     sqlalchemy.engine.Engine:base.py:1843 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 PRAGMA main.table_info("admin_users")
+INFO     sqlalchemy.engine.Engine:base.py:1843 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 PRAGMA temp.table_info("admin_users")
+INFO     sqlalchemy.engine.Engine:base.py:1843 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 PRAGMA main.table_info("admin_logs")
+INFO     sqlalchemy.engine.Engine:base.py:1843 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1843 PRAGMA temp.table_info("admin_logs")
+INFO     sqlalchemy.engine.Engine:base.py:1843 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:2705 COMMIT
+________________________________ test_mute_user ________________________________
+
+self = <unittest.mock._patch object at 0x7f8108331730>
+
+    def __enter__(self):
+        """Perform the patch."""
+        if self.is_started:
+            raise RuntimeError("Patch is already started")
+    
+        new, spec, spec_set = self.new, self.spec, self.spec_set
+        autospec, kwargs = self.autospec, self.kwargs
+        new_callable = self.new_callable
+        self.target = self.getter()
+    
+        # normalise False to None
+        if spec is False:
+            spec = None
+        if spec_set is False:
+            spec_set = None
+        if autospec is False:
+            autospec = None
+    
+        if spec is not None and autospec is not None:
+            raise TypeError("Can't specify spec and autospec")
+        if ((spec is not None or autospec is not None) and
+            spec_set not in (True, None)):
+            raise TypeError("Can't provide explicit spec_set *and* spec or autospec")
+    
+        original, local = self.get_original()
+    
+        if new is DEFAULT and autospec is None:
+            inherit = False
+            if spec is True:
+                # set spec to the object we are replacing
+                spec = original
+                if spec_set is True:
+                    spec_set = original
+                    spec = None
+            elif spec is not None:
+                if spec_set is True:
+                    spec_set = spec
+                    spec = None
+            elif spec_set is True:
+                spec_set = original
+    
+            if spec is not None or spec_set is not None:
+                if original is DEFAULT:
+                    raise TypeError("Can't use 'spec' with create=True")
+                if isinstance(original, type):
+                    # If we're patching out a class and there is a spec
+                    inherit = True
+    
+            # Determine the Klass to use
+            if new_callable is not None:
+                Klass = new_callable
+            elif spec is None and _is_async_obj(original):
+                Klass = AsyncMock
+            elif spec is not None or spec_set is not None:
+                this_spec = spec
+                if spec_set is not None:
+                    this_spec = spec_set
+                if _is_list(this_spec):
+                    not_callable = '__call__' not in this_spec
+                else:
+                    not_callable = not callable(this_spec)
+                if _is_async_obj(this_spec):
+                    Klass = AsyncMock
+                elif not_callable:
+                    Klass = NonCallableMagicMock
+                else:
+                    Klass = MagicMock
+            else:
+                Klass = MagicMock
+    
+            _kwargs = {}
+            if spec is not None:
+                _kwargs['spec'] = spec
+            if spec_set is not None:
+                _kwargs['spec_set'] = spec_set
+    
+            # add a name to mocks
+            if (isinstance(Klass, type) and
+                issubclass(Klass, NonCallableMock) and self.attribute):
+                _kwargs['name'] = self.attribute
+    
+            _kwargs.update(kwargs)
+            new = Klass(**_kwargs)
+    
+            if inherit and _is_instance_mock(new):
+                # we can only tell if the instance should be callable if the
+                # spec is not a list
+                this_spec = spec
+                if spec_set is not None:
+                    this_spec = spec_set
+                if (not _is_list(this_spec) and not
+                    _instance_callable(this_spec)):
+                    Klass = NonCallableMagicMock
+    
+                _kwargs.pop('name')
+                new.return_value = Klass(_new_parent=new, _new_name='()',
+                                         **_kwargs)
+        elif autospec is not None:
+            # spec is ignored, new *must* be default, spec_set is treated
+            # as a boolean. Should we check spec is not None and that spec_set
+            # is a bool?
+            if new is not DEFAULT:
+                raise TypeError(
+                    "autospec creates the mock for you. Can't specify "
+                    "autospec and new."
+                )
+            if original is DEFAULT:
+                raise TypeError("Can't use 'autospec' with create=True")
+            spec_set = bool(spec_set)
+            if autospec is True:
+                autospec = original
+    
+            if _is_instance_mock(self.target):
+                raise InvalidSpecError(
+                    f'Cannot autospec attr {self.attribute!r} as the patch '
+                    f'target has already been mocked out. '
+                    f'[target={self.target!r}, attr={autospec!r}]')
+            if _is_instance_mock(autospec):
+                target_name = getattr(self.target, '__name__', self.target)
+                raise InvalidSpecError(
+                    f'Cannot autospec attr {self.attribute!r} from target '
+                    f'{target_name!r} as it has already been mocked out. '
+                    f'[target={self.target!r}, attr={autospec!r}]')
+    
+            new = create_autospec(autospec, spec_set=spec_set,
+                                  _name=self.attribute, **kwargs)
+        elif kwargs:
+            # can't set keyword args when we aren't creating the mock
+            # XXXX If new is a Mock we could call new.configure_mock(**kwargs)
+            raise TypeError("Can't pass kwargs to a mock we aren't creating")
+    
+        new_attr = new
+    
+        self.temp_original = original
+        self.is_local = local
+        self._exit_stack = contextlib.ExitStack()
+        self.is_started = True
+        try:
+>           setattr(self.target, self.attribute, new_attr)
+
+../.pyenv/versions/3.12.8/lib/python3.12/unittest/mock.py:1581: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Bot[token=7637865854:AAHokjIVng4IiLxb1Ltoztr4zEzri5QgzyU]
+key = 'restrict_chat_member'
+value = <AsyncMock name='restrict_chat_member' id='140192165083136'>
+
+    def __setattr__(self, key: str, value: object) -> None:
+        """Overrides :meth:`object.__setattr__` to prevent the overriding of attributes.
+    
+        Raises:
+            :exc:`AttributeError`
+        """
+        # protected attributes can always be set for convenient internal use
+        if key[0] == "_" or not getattr(self, "_frozen", True):
+            super().__setattr__(key, value)
+            return
+    
+>       raise AttributeError(
+            f"Attribute `{key}` of class `{self.__class__.__name__}` can't be set!"
+        )
+E       AttributeError: Attribute `restrict_chat_member` of class `Bot` can't be set!
+
+venv/lib/python3.12/site-packages/telegram/_telegramobject.py:159: AttributeError
+
+During handling of the above exception, another exception occurred:
+
+group_service = <app.services.group_management.GroupManagementService object at 0x7f8108333590>
+
+    @pytest.mark.asyncio
+    async def test_mute_user(group_service):
+        """测试禁言用户"""
+>       with patch.object(group_service.bot, 'restrict_chat_member', new_callable=AsyncMock) as mock_restrict:
+
+tests/test_group_management.py:18: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../.pyenv/versions/3.12.8/lib/python3.12/unittest/mock.py:1594: in __enter__
+    if not self.__exit__(*sys.exc_info()):
+../.pyenv/versions/3.12.8/lib/python3.12/unittest/mock.py:1605: in __exit__
+    delattr(self.target, self.attribute)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Bot[token=7637865854:AAHokjIVng4IiLxb1Ltoztr4zEzri5QgzyU]
+key = 'restrict_chat_member'
+
+    def __delattr__(self, key: str) -> None:
+        """Overrides :meth:`object.__delattr__` to prevent the deletion of attributes.
+    
+        Raises:
+            :exc:`AttributeError`
+        """
+        # protected attributes can always be set for convenient internal use
+        if key[0] == "_" or not getattr(self, "_frozen", True):
+            super().__delattr__(key)
+            return
+    
+>       raise AttributeError(
+            f"Attribute `{key}` of class `{self.__class__.__name__}` can't be deleted!"
+        )
+E       AttributeError: Attribute `restrict_chat_member` of class `Bot` can't be deleted!
+
+venv/lib/python3.12/site-packages/telegram/_telegramobject.py:174: AttributeError
+_______________________________ test_unmute_user _______________________________
+
+self = <unittest.mock._patch object at 0x7f8108c619a0>
+
+    def __enter__(self):
+        """Perform the patch."""
+        if self.is_started:
+            raise RuntimeError("Patch is already started")
+    
+        new, spec, spec_set = self.new, self.spec, self.spec_set
+        autospec, kwargs = self.autospec, self.kwargs
+        new_callable = self.new_callable
+        self.target = self.getter()
+    
+        # normalise False to None
+        if spec is False:
+            spec = None
+        if spec_set is False:
+            spec_set = None
+        if autospec is False:
+            autospec = None
+    
+        if spec is not None and autospec is not None:
+            raise TypeError("Can't specify spec and autospec")
+        if ((spec is not None or autospec is not None) and
+            spec_set not in (True, None)):
+            raise TypeError("Can't provide explicit spec_set *and* spec or autospec")
+    
+        original, local = self.get_original()
+    
+        if new is DEFAULT and autospec is None:
+            inherit = False
+            if spec is True:
+                # set spec to the object we are replacing
+                spec = original
+                if spec_set is True:
+                    spec_set = original
+                    spec = None
+            elif spec is not None:
+                if spec_set is True:
+                    spec_set = spec
+                    spec = None
+            elif spec_set is True:
+                spec_set = original
+    
+            if spec is not None or spec_set is not None:
+                if original is DEFAULT:
+                    raise TypeError("Can't use 'spec' with create=True")
+                if isinstance(original, type):
+                    # If we're patching out a class and there is a spec
+                    inherit = True
+    
+            # Determine the Klass to use
+            if new_callable is not None:
+                Klass = new_callable
+            elif spec is None and _is_async_obj(original):
+                Klass = AsyncMock
+            elif spec is not None or spec_set is not None:
+                this_spec = spec
+                if spec_set is not None:
+                    this_spec = spec_set
+                if _is_list(this_spec):
+                    not_callable = '__call__' not in this_spec
+                else:
+                    not_callable = not callable(this_spec)
+                if _is_async_obj(this_spec):
+                    Klass = AsyncMock
+                elif not_callable:
+                    Klass = NonCallableMagicMock
+                else:
+                    Klass = MagicMock
+            else:
+                Klass = MagicMock
+    
+            _kwargs = {}
+            if spec is not None:
+                _kwargs['spec'] = spec
+            if spec_set is not None:
+                _kwargs['spec_set'] = spec_set
+    
+            # add a name to mocks
+            if (isinstance(Klass, type) and
+                issubclass(Klass, NonCallableMock) and self.attribute):
+                _kwargs['name'] = self.attribute
+    
+            _kwargs.update(kwargs)
+            new = Klass(**_kwargs)
+    
+            if inherit and _is_instance_mock(new):
+                # we can only tell if the instance should be callable if the
+                # spec is not a list
+                this_spec = spec
+                if spec_set is not None:
+                    this_spec = spec_set
+                if (not _is_list(this_spec) and not
+                    _instance_callable(this_spec)):
+                    Klass = NonCallableMagicMock
+    
+                _kwargs.pop('name')
+                new.return_value = Klass(_new_parent=new, _new_name='()',
+                                         **_kwargs)
+        elif autospec is not None:
+            # spec is ignored, new *must* be default, spec_set is treated
+            # as a boolean. Should we check spec is not None and that spec_set
+            # is a bool?
+            if new is not DEFAULT:
+                raise TypeError(
+                    "autospec creates the mock for you. Can't specify "
+                    "autospec and new."
+                )
+            if original is DEFAULT:
+                raise TypeError("Can't use 'autospec' with create=True")
+            spec_set = bool(spec_set)
+            if autospec is True:
+                autospec = original
+    
+            if _is_instance_mock(self.target):
+                raise InvalidSpecError(
+                    f'Cannot autospec attr {self.attribute!r} as the patch '
+                    f'target has already been mocked out. '
+                    f'[target={self.target!r}, attr={autospec!r}]')
+            if _is_instance_mock(autospec):
+                target_name = getattr(self.target, '__name__', self.target)
+                raise InvalidSpecError(
+                    f'Cannot autospec attr {self.attribute!r} from target '
+                    f'{target_name!r} as it has already been mocked out. '
+                    f'[target={self.target!r}, attr={autospec!r}]')
+    
+            new = create_autospec(autospec, spec_set=spec_set,
+                                  _name=self.attribute, **kwargs)
+        elif kwargs:
+            # can't set keyword args when we aren't creating the mock
+            # XXXX If new is a Mock we could call new.configure_mock(**kwargs)
+            raise TypeError("Can't pass kwargs to a mock we aren't creating")
+    
+        new_attr = new
+    
+        self.temp_original = original
+        self.is_local = local
+        self._exit_stack = contextlib.ExitStack()
+        self.is_started = True
+        try:
+>           setattr(self.target, self.attribute, new_attr)
+
+../.pyenv/versions/3.12.8/lib/python3.12/unittest/mock.py:1581: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Bot[token=7637865854:AAHokjIVng4IiLxb1Ltoztr4zEzri5QgzyU]
+key = 'restrict_chat_member'
+value = <AsyncMock name='restrict_chat_member' id='140192174711840'>
+
+    def __setattr__(self, key: str, value: object) -> None:
+        """Overrides :meth:`object.__setattr__` to prevent the overriding of attributes.
+    
+        Raises:
+            :exc:`AttributeError`
+        """
+        # protected attributes can always be set for convenient internal use
+        if key[0] == "_" or not getattr(self, "_frozen", True):
+            super().__setattr__(key, value)
+            return
+    
+>       raise AttributeError(
+            f"Attribute `{key}` of class `{self.__class__.__name__}` can't be set!"
+        )
+E       AttributeError: Attribute `restrict_chat_member` of class `Bot` can't be set!
+
+venv/lib/python3.12/site-packages/telegram/_telegramobject.py:159: AttributeError
+
+During handling of the above exception, another exception occurred:
+
+group_service = <app.services.group_management.GroupManagementService object at 0x7f8108332270>
+
+    @pytest.mark.asyncio
+    async def test_unmute_user(group_service):
+        """测试解除禁言"""
+>       with patch.object(group_service.bot, 'restrict_chat_member', new_callable=AsyncMock) as mock_restrict:
+
+tests/test_group_management.py:42: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../.pyenv/versions/3.12.8/lib/python3.12/unittest/mock.py:1594: in __enter__
+    if not self.__exit__(*sys.exc_info()):
+../.pyenv/versions/3.12.8/lib/python3.12/unittest/mock.py:1605: in __exit__
+    delattr(self.target, self.attribute)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Bot[token=7637865854:AAHokjIVng4IiLxb1Ltoztr4zEzri5QgzyU]
+key = 'restrict_chat_member'
+
+    def __delattr__(self, key: str) -> None:
+        """Overrides :meth:`object.__delattr__` to prevent the deletion of attributes.
+    
+        Raises:
+            :exc:`AttributeError`
+        """
+        # protected attributes can always be set for convenient internal use
+        if key[0] == "_" or not getattr(self, "_frozen", True):
+            super().__delattr__(key)
+            return
+    
+>       raise AttributeError(
+            f"Attribute `{key}` of class `{self.__class__.__name__}` can't be deleted!"
+        )
+E       AttributeError: Attribute `restrict_chat_member` of class `Bot` can't be deleted!
+
+venv/lib/python3.12/site-packages/telegram/_telegramobject.py:174: AttributeError
+_____________________________ test_get_chat_member _____________________________
+
+self = <unittest.mock._patch object at 0x7f8108346db0>
+
+    def __enter__(self):
+        """Perform the patch."""
+        if self.is_started:
+            raise RuntimeError("Patch is already started")
+    
+        new, spec, spec_set = self.new, self.spec, self.spec_set
+        autospec, kwargs = self.autospec, self.kwargs
+        new_callable = self.new_callable
+        self.target = self.getter()
+    
+        # normalise False to None
+        if spec is False:
+            spec = None
+        if spec_set is False:
+            spec_set = None
+        if autospec is False:
+            autospec = None
+    
+        if spec is not None and autospec is not None:
+            raise TypeError("Can't specify spec and autospec")
+        if ((spec is not None or autospec is not None) and
+            spec_set not in (True, None)):
+            raise TypeError("Can't provide explicit spec_set *and* spec or autospec")
+    
+        original, local = self.get_original()
+    
+        if new is DEFAULT and autospec is None:
+            inherit = False
+            if spec is True:
+                # set spec to the object we are replacing
+                spec = original
+                if spec_set is True:
+                    spec_set = original
+                    spec = None
+            elif spec is not None:
+                if spec_set is True:
+                    spec_set = spec
+                    spec = None
+            elif spec_set is True:
+                spec_set = original
+    
+            if spec is not None or spec_set is not None:
+                if original is DEFAULT:
+                    raise TypeError("Can't use 'spec' with create=True")
+                if isinstance(original, type):
+                    # If we're patching out a class and there is a spec
+                    inherit = True
+    
+            # Determine the Klass to use
+            if new_callable is not None:
+                Klass = new_callable
+            elif spec is None and _is_async_obj(original):
+                Klass = AsyncMock
+            elif spec is not None or spec_set is not None:
+                this_spec = spec
+                if spec_set is not None:
+                    this_spec = spec_set
+                if _is_list(this_spec):
+                    not_callable = '__call__' not in this_spec
+                else:
+                    not_callable = not callable(this_spec)
+                if _is_async_obj(this_spec):
+                    Klass = AsyncMock
+                elif not_callable:
+                    Klass = NonCallableMagicMock
+                else:
+                    Klass = MagicMock
+            else:
+                Klass = MagicMock
+    
+            _kwargs = {}
+            if spec is not None:
+                _kwargs['spec'] = spec
+            if spec_set is not None:
+                _kwargs['spec_set'] = spec_set
+    
+            # add a name to mocks
+            if (isinstance(Klass, type) and
+                issubclass(Klass, NonCallableMock) and self.attribute):
+                _kwargs['name'] = self.attribute
+    
+            _kwargs.update(kwargs)
+            new = Klass(**_kwargs)
+    
+            if inherit and _is_instance_mock(new):
+                # we can only tell if the instance should be callable if the
+                # spec is not a list
+                this_spec = spec
+                if spec_set is not None:
+                    this_spec = spec_set
+                if (not _is_list(this_spec) and not
+                    _instance_callable(this_spec)):
+                    Klass = NonCallableMagicMock
+    
+                _kwargs.pop('name')
+                new.return_value = Klass(_new_parent=new, _new_name='()',
+                                         **_kwargs)
+        elif autospec is not None:
+            # spec is ignored, new *must* be default, spec_set is treated
+            # as a boolean. Should we check spec is not None and that spec_set
+            # is a bool?
+            if new is not DEFAULT:
+                raise TypeError(
+                    "autospec creates the mock for you. Can't specify "
+                    "autospec and new."
+                )
+            if original is DEFAULT:
+                raise TypeError("Can't use 'autospec' with create=True")
+            spec_set = bool(spec_set)
+            if autospec is True:
+                autospec = original
+    
+            if _is_instance_mock(self.target):
+                raise InvalidSpecError(
+                    f'Cannot autospec attr {self.attribute!r} as the patch '
+                    f'target has already been mocked out. '
+                    f'[target={self.target!r}, attr={autospec!r}]')
+            if _is_instance_mock(autospec):
+                target_name = getattr(self.target, '__name__', self.target)
+                raise InvalidSpecError(
+                    f'Cannot autospec attr {self.attribute!r} from target '
+                    f'{target_name!r} as it has already been mocked out. '
+                    f'[target={self.target!r}, attr={autospec!r}]')
+    
+            new = create_autospec(autospec, spec_set=spec_set,
+                                  _name=self.attribute, **kwargs)
+        elif kwargs:
+            # can't set keyword args when we aren't creating the mock
+            # XXXX If new is a Mock we could call new.configure_mock(**kwargs)
+            raise TypeError("Can't pass kwargs to a mock we aren't creating")
+    
+        new_attr = new
+    
+        self.temp_original = original
+        self.is_local = local
+        self._exit_stack = contextlib.ExitStack()
+        self.is_started = True
+        try:
+>           setattr(self.target, self.attribute, new_attr)
+
+../.pyenv/versions/3.12.8/lib/python3.12/unittest/mock.py:1581: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Bot[token=7637865854:AAHokjIVng4IiLxb1Ltoztr4zEzri5QgzyU]
+key = 'get_chat_member'
+value = <AsyncMock name='get_chat_member' id='140192165161504'>
+
+    def __setattr__(self, key: str, value: object) -> None:
+        """Overrides :meth:`object.__setattr__` to prevent the overriding of attributes.
+    
+        Raises:
+            :exc:`AttributeError`
+        """
+        # protected attributes can always be set for convenient internal use
+        if key[0] == "_" or not getattr(self, "_frozen", True):
+            super().__setattr__(key, value)
+            return
+    
+>       raise AttributeError(
+            f"Attribute `{key}` of class `{self.__class__.__name__}` can't be set!"
+        )
+E       AttributeError: Attribute `get_chat_member` of class `Bot` can't be set!
+
+venv/lib/python3.12/site-packages/telegram/_telegramobject.py:159: AttributeError
+
+During handling of the above exception, another exception occurred:
+
+group_service = <app.services.group_management.GroupManagementService object at 0x7f8108346cf0>
+
+    @pytest.mark.asyncio
+    async def test_get_chat_member(group_service):
+        """测试获取群组成员信息"""
+>       with patch.object(group_service.bot, 'get_chat_member', new_callable=AsyncMock) as mock_get:
+
+tests/test_group_management.py:65: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../.pyenv/versions/3.12.8/lib/python3.12/unittest/mock.py:1594: in __enter__
+    if not self.__exit__(*sys.exc_info()):
+../.pyenv/versions/3.12.8/lib/python3.12/unittest/mock.py:1605: in __exit__
+    delattr(self.target, self.attribute)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Bot[token=7637865854:AAHokjIVng4IiLxb1Ltoztr4zEzri5QgzyU]
+key = 'get_chat_member'
+
+    def __delattr__(self, key: str) -> None:
+        """Overrides :meth:`object.__delattr__` to prevent the deletion of attributes.
+    
+        Raises:
+            :exc:`AttributeError`
+        """
+        # protected attributes can always be set for convenient internal use
+        if key[0] == "_" or not getattr(self, "_frozen", True):
+            super().__delattr__(key)
+            return
+    
+>       raise AttributeError(
+            f"Attribute `{key}` of class `{self.__class__.__name__}` can't be deleted!"
+        )
+E       AttributeError: Attribute `get_chat_member` of class `Bot` can't be deleted!
+
+venv/lib/python3.12/site-packages/telegram/_telegramobject.py:174: AttributeError
+=============================== warnings summary ===============================
+venv/lib/python3.12/site-packages/passlib/utils/__init__.py:854
+  /home/ubuntu/coser_bot/venv/lib/python3.12/site-packages/passlib/utils/__init__.py:854: DeprecationWarning: 'crypt' is deprecated and slated for removal in Python 3.13
+    from crypt import crypt as _crypt
+
+venv/lib/python3.12/site-packages/pydantic/_internal/_config.py:295
+venv/lib/python3.12/site-packages/pydantic/_internal/_config.py:295
+  /home/ubuntu/coser_bot/venv/lib/python3.12/site-packages/pydantic/_internal/_config.py:295: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.10/migration/
+    warnings.warn(DEPRECATION_MESSAGE, DeprecationWarning)
+
+app/db/database.py:24
+  /home/ubuntu/coser_bot/app/db/database.py:24: MovedIn20Warning: The ``declarative_base()`` function is now available as sqlalchemy.orm.declarative_base(). (deprecated since: 2.0) (Background on SQLAlchemy 2.0 at: https://sqlalche.me/e/b8d9)
+    Base = declarative_base()
+
+tests/test_admin_auth.py::test_login
+tests/test_admin_auth.py::test_get_admin_info
+tests/test_admin_auth.py::test_logout
+  /home/ubuntu/coser_bot/app/core/auth.py:48: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    expire = datetime.utcnow() + expires_delta
+
+tests/test_admin_auth.py::test_login
+tests/test_admin_auth.py::test_get_admin_info
+tests/test_admin_auth.py::test_logout
+  /home/ubuntu/coser_bot/app/routers/admin.py:58: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    admin.last_login = datetime.utcnow()
+
+tests/test_admin_auth.py::test_get_admin_info
+tests/test_admin_auth.py::test_logout
+  /home/ubuntu/coser_bot/venv/lib/python3.12/site-packages/jose/jwt.py:311: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    now = timegm(datetime.utcnow().utctimetuple())
+
+tests/test_admin_auth.py::test_logout
+  /home/ubuntu/coser_bot/app/core/auth.py:126: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    ttl = exp - datetime.utcnow().timestamp()
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_admin_auth.py::test_get_admin_info - assert 401 == 200
+FAILED tests/test_group_management.py::test_mute_user - AttributeError: Attribute `restrict_chat_member` of class `Bot` can't be de...
+FAILED tests/test_group_management.py::test_unmute_user - AttributeError: Attribute `restrict_chat_member` of class `Bot` can't be de...
+FAILED tests/test_group_management.py::test_get_chat_member - AttributeError: Attribute `get_chat_member` of class `Bot` can't be deleted!
+=================== 4 failed, 3 passed, 13 warnings in 3.71s ===================
