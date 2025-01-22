@@ -1,30 +1,34 @@
 """
-用户模型模块
-定义用户相关的数据库模型
+用户相关数据库模型
 """
-from sqlalchemy import Column, BigInteger, String, TIMESTAMP, text, Integer
-from app.db.database import Base
+from sqlalchemy import Column, BigInteger, Integer, String, TIMESTAMP, text
+from sqlalchemy.ext.declarative import declarative_base
+
+Base = declarative_base()
 
 class User(Base):
-    """用户表模型"""
-    __table_args__ = {'extend_existing': True}
-    __tablename__ = "users"
+    """用户模型"""
+    __tablename__ = 'users'
 
-    id = Column(BigInteger().with_variant(Integer, "sqlite"), primary_key=True, autoincrement=True)
+    id = Column(BigInteger, primary_key=True, autoincrement=True)
     telegram_id = Column(String(32), unique=True, nullable=False)
     email = Column(String(128), unique=True)
-    status = Column(BigInteger().with_variant(Integer, "sqlite"), default=1)
-    points = Column(BigInteger().with_variant(Integer, "sqlite"), default=0)
+    status = Column(Integer, default=1)
+    points = Column(BigInteger, default=0)
     created_at = Column(TIMESTAMP, nullable=False, server_default=text('CURRENT_TIMESTAMP'))
-    updated_at = Column(TIMESTAMP, nullable=False, server_default=text('CURRENT_TIMESTAMP'))
+    updated_at = Column(
+        TIMESTAMP, 
+        nullable=False,
+        server_default=text('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP')
+    )
 
 class PointRecord(Base):
-    """积分记录表模型"""
-    __tablename__ = "point_records"
+    """积分记录模型"""
+    __tablename__ = 'point_records'
 
-    id = Column(BigInteger().with_variant(Integer, "sqlite"), primary_key=True, autoincrement=True)
-    user_id = Column(BigInteger().with_variant(Integer, "sqlite"), nullable=False)
-    points = Column(BigInteger().with_variant(Integer, "sqlite"), nullable=False)
-    type = Column(BigInteger().with_variant(Integer, "sqlite"), nullable=False, comment='1:签到 2:活动 3:转移')
+    id = Column(BigInteger, primary_key=True, autoincrement=True)
+    user_id = Column(BigInteger, nullable=False)
+    points = Column(Integer, nullable=False)
+    type = Column(Integer, nullable=False, comment='1:签到 2:活动 3:转移')
     description = Column(String(255))
     created_at = Column(TIMESTAMP, nullable=False, server_default=text('CURRENT_TIMESTAMP'))

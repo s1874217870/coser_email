@@ -1,29 +1,42 @@
 """
 性能监控中间件
-用于监控API响应时间和并发处理
+处理性能指标收集和监控
 """
-import time
 from fastapi import Request
-from app.core.redis import redis_client
+from prometheus_client import Counter, Histogram
+import time
+
+# 请求计数器
+REQUEST_COUNT = Counter(
+    'http_requests_total',
+    'Total HTTP requests count',
+    ['method', 'endpoint', 'status']
+)
+
+# 响应时间直方图
+REQUEST_LATENCY = Histogram(
+    'http_request_duration_seconds',
+    'HTTP request latency in seconds',
+    ['method', 'endpoint']
+)
 
 async def performance_middleware(request: Request, call_next):
-    """
-    性能监控中间件
-    监控API响应时间和请求数量
-    """
+    """性能监控中间件"""
     start_time = time.time()
-    
-    # 增加请求计数
-    redis_client.incr("api:request_count")
     
     response = await call_next(request)
     
-    # 计算响应时间
-    process_time = (time.time() - start_time) * 1000
-    redis_client.lpush("api:response_times", process_time)
+    # 记录请求数
+    REQUEST_COUNT.labels(
+        method=request.method,
+        endpoint=request.url.path,
+        status=response.status_code
+    ).inc()
     
-    # 如果响应时间超过200ms，记录警告
-    if process_time > 200:
-        redis_client.incr("api:slow_requests")
+    # 记录响应时间
+    REQUEST_LATENCY.labels(
+        method=request.method,
+        endpoint=request.url.path
+    ).observe(time.time() - start_time)
     
     return response

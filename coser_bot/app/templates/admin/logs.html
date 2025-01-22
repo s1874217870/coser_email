@@ -1,0 +1,158 @@
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col">
+            <h2>安全日志</h2>
+        </div>
+    </div>
+
+    <!-- 统计卡片 -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">信息日志</h5>
+                    <p class="card-text">{{ statistics.info || 0 }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">警告日志</h5>
+                    <p class="card-text">{{ statistics.warning || 0 }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">错误日志</h5>
+                    <p class="card-text">{{ statistics.error || 0 }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">总日志数</h5>
+                    <p class="card-text">{{ totalLogs }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 筛选表单 -->
+    <div class="row mb-4">
+        <div class="col">
+            <div class="card">
+                <div class="card-body">
+                    <form @submit.prevent="searchLogs">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label>开始日期</label>
+                                    <input type="date" class="form-control" v-model="filters.startDate">
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label>结束日期</label>
+                                    <input type="date" class="form-control" v-model="filters.endDate">
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="form-group">
+                                    <label>日志级别</label>
+                                    <select class="form-control" v-model="filters.level">
+                                        <option value="">全部</option>
+                                        <option value="info">信息</option>
+                                        <option value="warning">警告</option>
+                                        <option value="error">错误</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="form-group">
+                                    <label>事件类型</label>
+                                    <select class="form-control" v-model="filters.eventType">
+                                        <option value="">全部</option>
+                                        <option value="login">登录</option>
+                                        <option value="operation">操作</option>
+                                        <option value="system">系统</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="form-group">
+                                    <label>&nbsp;</label>
+                                    <button type="submit" class="btn btn-primary w-100">
+                                        <i class="fas fa-search"></i> 搜索
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 日志表格 -->
+    <div class="row">
+        <div class="col">
+            <div class="card">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>时间</th>
+                                    <th>级别</th>
+                                    <th>类型</th>
+                                    <th>描述</th>
+                                    <th>用户ID</th>
+                                    <th>IP地址</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="log in logs" :key="log._id">
+                                    <td>{{ formatDate(log.created_at) }}</td>
+                                    <td>
+                                        <span :class="getLevelClass(log.level)">
+                                            {{ log.level }}
+                                        </span>
+                                    </td>
+                                    <td>{{ log.event_type }}</td>
+                                    <td>{{ log.description }}</td>
+                                    <td>{{ log.user_id || '-' }}</td>
+                                    <td>{{ log.ip_address || '-' }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- 分页 -->
+                    <nav>
+                        <ul class="pagination justify-content-center">
+                            <li class="page-item" :class="{ disabled: currentPage === 1 }">
+                                <a class="page-link" href="#" @click.prevent="changePage(currentPage - 1)">
+                                    上一页
+                                </a>
+                            </li>
+                            <li v-for="page in totalPages" :key="page" class="page-item" :class="{ active: currentPage === page }">
+                                <a class="page-link" href="#" @click.prevent="changePage(page)">
+                                    {{ page }}
+                                </a>
+                            </li>
+                            <li class="page-item" :class="{ disabled: currentPage === totalPages }">
+                                <a class="page-link" href="#" @click.prevent="changePage(currentPage + 1)">
+                                    下一页
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

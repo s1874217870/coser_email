@@ -1,6 +1,6 @@
 """
 RabbitMQ连接模块
-用于消息队列管理
+处理RabbitMQ连接和操作
 """
 import aio_pika
 from app.core.config import get_settings
@@ -16,20 +16,7 @@ async def get_rabbitmq_connection():
         password="guest"
     )
 
-async def publish_message(queue_name: str, message: str):
-    """
-    发布消息到指定队列
-    
-    参数:
-        queue_name: 队列名称
-        message: 消息内容
-    """
+async def get_channel():
+    """获取RabbitMQ通道"""
     connection = await get_rabbitmq_connection()
-    async with connection:
-        channel = await connection.channel()
-        await channel.declare_queue(queue_name, durable=True)
-        
-        await channel.default_exchange.publish(
-            aio_pika.Message(body=message.encode()),
-            routing_key=queue_name
-        )
+    return await connection.channel()

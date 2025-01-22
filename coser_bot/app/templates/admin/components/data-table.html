@@ -1,0 +1,177 @@
+<template>
+  <div class="data-table">
+    <!-- 工具栏 -->
+    <div class="toolbar mb-3">
+      <div class="row">
+        <div class="col">
+          <div class="input-group">
+            <input type="text" class="form-control" v-model="searchQuery" placeholder="搜索...">
+            <button class="btn btn-outline-secondary" type="button" @click="search">
+              <i class="fas fa-search"></i>
+            </button>
+          </div>
+        </div>
+        <div class="col-auto">
+          <div class="btn-group" v-if="selected.length">
+            <button class="btn btn-danger" @click="batchDelete">
+              <i class="fas fa-trash"></i> 删除
+            </button>
+            <button class="btn btn-warning" @click="batchDisable">
+              <i class="fas fa-ban"></i> 禁用
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 数据表格 -->
+    <div class="table-responsive">
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>
+              <input type="checkbox" v-model="selectAll" @change="toggleSelectAll">
+            </th>
+            <th v-for="column in columns" :key="column.key">
+              {{ column.label }}
+              <i v-if="column.sortable" class="fas fa-sort" @click="sort(column.key)"></i>
+            </th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="item in items" :key="item.id">
+            <td>
+              <input type="checkbox" v-model="selected" :value="item.id">
+            </td>
+            <td v-for="column in columns" :key="column.key">
+              <template v-if="column.type === 'date'">
+                {{ formatDate(item[column.key]) }}
+              </template>
+              <template v-else-if="column.type === 'status'">
+                <span :class="getStatusClass(item[column.key])">
+                  {{ item[column.key] }}
+                </span>
+              </template>
+              <template v-else>
+                {{ item[column.key] }}
+              </template>
+            </td>
+            <td>
+              <div class="btn-group">
+                <button class="btn btn-sm btn-primary" @click="edit(item)">
+                  <i class="fas fa-edit"></i>
+                </button>
+                <button class="btn btn-sm btn-danger" @click="remove(item)">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 分页 -->
+    <nav>
+      <ul class="pagination justify-content-center">
+        <li class="page-item" :class="{ disabled: currentPage === 1 }">
+          <a class="page-link" href="#" @click.prevent="changePage(currentPage - 1)">
+            上一页
+          </a>
+        </li>
+        <li v-for="page in totalPages" :key="page" class="page-item" :class="{ active: currentPage === page }">
+          <a class="page-link" href="#" @click.prevent="changePage(page)">
+            {{ page }}
+          </a>
+        </li>
+        <li class="page-item" :class="{ disabled: currentPage === totalPages }">
+          <a class="page-link" href="#" @click.prevent="changePage(currentPage + 1)">
+            下一页
+          </a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</template>
+
+<script>
+export default {
+  name: 'DataTable',
+  props: {
+    columns: {
+      type: Array,
+      required: true
+    },
+    items: {
+      type: Array,
+      required: true
+    },
+    totalPages: {
+      type: Number,
+      required: true
+    },
+    currentPage: {
+      type: Number,
+      required: true
+    }
+  },
+  data() {
+    return {
+      searchQuery: '',
+      selected: [],
+      selectAll: false,
+      sortKey: '',
+      sortOrder: 'asc'
+    }
+  },
+  methods: {
+    search() {
+      this.$emit('search', this.searchQuery)
+    },
+    sort(key) {
+      if (this.sortKey === key) {
+        this.sortOrder = this.sortOrder === 'asc' ? 'desc' : 'asc'
+      } else {
+        this.sortKey = key
+        this.sortOrder = 'asc'
+      }
+      this.$emit('sort', { key: this.sortKey, order: this.sortOrder })
+    },
+    changePage(page) {
+      this.$emit('page-change', page)
+    },
+    toggleSelectAll() {
+      if (this.selectAll) {
+        this.selected = this.items.map(item => item.id)
+      } else {
+        this.selected = []
+      }
+    },
+    edit(item) {
+      this.$emit('edit', item)
+    },
+    remove(item) {
+      this.$emit('remove', item)
+    },
+    batchDelete() {
+      this.$emit('batch-delete', this.selected)
+    },
+    batchDisable() {
+      this.$emit('batch-disable', this.selected)
+    },
+    formatDate(date) {
+      if (!date) return '-'
+      return new Date(date).toLocaleString()
+    },
+    getStatusClass(status) {
+      const classes = {
+        active: 'badge bg-success',
+        inactive: 'badge bg-danger',
+        pending: 'badge bg-warning'
+      }
+      return classes[status] || 'badge bg-secondary'
+    }
+  }
+}
+</script>

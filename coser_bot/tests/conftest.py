@@ -1,89 +1,69 @@
 """
 测试配置文件
-提供共享的测试夹具
+提供测试所需的fixture
 """
 import pytest
-import pytest_asyncio
-from fastapi import FastAPI
-from httpx import AsyncClient, ASGITransport
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
-from sqlalchemy.pool import StaticPool
-from app.models.admin import AdminUser, AdminRole, Base
-from app.core.auth import Auth
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
+from sqlalchemy.orm import sessionmaker
 from app.core.config import get_settings
-from app.core.redis import redis_client
-from app.db.database import get_db
-from app.routers import admin as admin_router
+from app.models.user import Base
+import asyncio
+import redis
+from typing import AsyncGenerator
 
 settings = get_settings()
-settings.TESTING = True
 
-# 创建测试数据库引擎
-TEST_DATABASE_URL = "sqlite+aiosqlite:///:memory:"
-engine = create_async_engine(
-    TEST_DATABASE_URL,
-    poolclass=StaticPool,
-    echo=True
+# 测试数据库URL
+TEST_DATABASE_URL = (
+    f"mysql+aiomysql://{settings.MYSQL_USER}:{settings.MYSQL_PASSWORD}"
+    f"@{settings.MYSQL_HOST}:{settings.MYSQL_PORT}/test_coser_bot"
 )
 
-TestingSessionLocal = async_sessionmaker(
-    engine,
-    expire_on_commit=False,
-    autocommit=False,
-    autoflush=False
-)
+@pytest.fixture(scope="session")
+def event_loop():
+    """创建事件循环"""
+    loop = asyncio.get_event_loop_policy().new_event_loop()
+    yield loop
+    loop.close()
 
-# 创建测试应用
-app = FastAPI()
-app.include_router(admin_router.router)
-
-# 替换数据库依赖
-async def override_get_db():
-    """获取测试数据库会话"""
-    async with TestingSessionLocal() as session:
-        try:
-            yield session
-        finally:
-            await session.close()
-
-app.dependency_overrides[get_db] = override_get_db
-
-@pytest_asyncio.fixture(autouse=True)
-async def setup_test_db():
-    """设置测试数据库"""
+@pytest.fixture(scope="session")
+async def test_engine():
+    """创建测试数据库引擎"""
+    engine = create_async_engine(TEST_DATABASE_URL, echo=True)
+    
+    # 创建测试数据库表
     async with engine.begin() as conn:
-        await conn.run_sync(lambda ctx: Base.metadata.create_all(ctx))
-    yield
-    redis_client.flushdb()
+        await conn.run_sync(Base.metadata.drop_all)
+        await conn.run_sync(Base.metadata.create_all)
+        
+    yield engine
+    
+    # 清理测试数据库
     async with engine.begin() as conn:
-        await conn.run_sync(lambda ctx: Base.metadata.drop_all(ctx))
-
-@pytest_asyncio.fixture
-async def test_db():
+        await conn.run_sync(Base.metadata.drop_all)
+        
+@pytest.fixture
+async def test_session(test_engine) -> AsyncGenerator[AsyncSession, None]:
     """创建测试数据库会话"""
-    async with TestingSessionLocal() as session:
-        try:
-            yield session
-        finally:
-            await session.close()
-
-@pytest_asyncio.fixture
-async def test_admin(test_db):
-    """创建测试管理员"""
-    admin = AdminUser(
-        username="test_admin",
-        password_hash=Auth.get_password_hash("testpass123"),
-        role=AdminRole.SUPERADMIN,
-        is_active=True
+    async_session = sessionmaker(
+        test_engine,
+        class_=AsyncSession,
+        expire_on_commit=False
     )
-    test_db.add(admin)
-    await test_db.commit()
-    await test_db.refresh(admin)
-    return admin
-
-@pytest_asyncio.fixture
-async def client():
-    """创建异步测试客户端"""
-    transport = ASGITransport(app=app)
-    async with AsyncClient(transport=transport, base_url="http://test") as ac:
-        yield ac
+    
+    async with async_session() as session:
+        yield session
+        await session.rollback()
+        
+@pytest.fixture
+def test_redis():
+    """创建测试Redis客户端"""
+    redis_client = redis.Redis(
+        host=settings.REDIS_HOST,
+        port=settings.REDIS_PORT,
+        db=15,  # 使用单独的数据库用于测试
+        decode_responses=True
+    )
+    yield redis_client
+    redis_client.flushdb()  # 清理测试数据
+    redis_client.close()

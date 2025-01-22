@@ -1,13 +1,14 @@
 """
-Redis连接模块
-用于管理Redis连接和提供缓存服务
+Redis客户端模块
+处理Redis连接和操作
 """
-from redis import Redis
+import redis
 from app.core.config import get_settings
 
 settings = get_settings()
 
-redis_client = Redis(
+# 创建Redis连接池
+redis_client = redis.Redis(
     host=settings.REDIS_HOST,
     port=settings.REDIS_PORT,
     db=settings.REDIS_DB,
@@ -15,18 +16,18 @@ redis_client = Redis(
 )
 
 class RateLimit:
-    """IP限流实现"""
+    """速率限制类"""
+    
     @staticmethod
-    async def check_rate_limit(ip: str, limit: int = 10, period: int = 3600) -> bool:
+    def check_rate_limit(key: str, limit: int, period: int) -> bool:
         """
-        检查IP是否超出限流
+        检查是否超出速率限制
         
         参数:
-            ip: IP地址
+            key: Redis键
             limit: 限制次数
             period: 时间周期(秒)
         """
-        key = f"rate_limit:{ip}"
         current = redis_client.incr(key)
         if current == 1:
             redis_client.expire(key, period)
